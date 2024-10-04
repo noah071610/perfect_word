@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class DefaultLayout extends ConsumerWidget {
+class SliverLayout extends ConsumerWidget {
   final String? title;
-  final Widget child;
   final Widget? bottomNavigationBar;
   final List<Widget>? actions;
+  final List<Widget> slivers;
+  final PreferredSizeWidget? bottom;
   final void Function()? onClickTitle;
 
-  const DefaultLayout({
-    required this.child,
+  const SliverLayout({
+    required this.slivers,
     this.title,
     this.bottomNavigationBar,
     this.actions,
+    this.bottom,
     this.onClickTitle = null,
     super.key,
   });
@@ -20,20 +22,15 @@ class DefaultLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ref) {
     return Scaffold(
-      body: SafeArea(
-        top: true,
-        bottom: false,
-        child: child,
+      body: CustomScrollView(
+        slivers: [renderSliverAppbar(context, ref), ...slivers],
       ),
-      appBar: renderAppbar(context),
       bottomNavigationBar: bottomNavigationBar,
     );
   }
 
-  AppBar? renderAppbar(BuildContext context) {
-    if (title == null) return null;
-
-    return AppBar(
+  SliverAppBar renderSliverAppbar(BuildContext context, WidgetRef ref) {
+    return SliverAppBar(
       title: GestureDetector(
         onTap: onClickTitle,
         child: Text(
@@ -42,8 +39,11 @@ class DefaultLayout extends ConsumerWidget {
         ),
       ),
       elevation: 0,
-      actions: actions,
+      actions: [
+        if (actions != null) ...actions!,
+      ],
       centerTitle: false,
+      bottom: bottom,
     );
   }
 }
