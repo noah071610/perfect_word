@@ -54,8 +54,8 @@ class wordBookListNotifier extends StateNotifier<List<WordBookListModel>> {
     return state.firstWhere((e) => e.key == key);
   }
 
-  Future<void> removeWordList(List<String> wordBookKeys) async {
-    state = state.where((word) => !wordBookKeys.contains(word.key)).toList();
+  Future<void> removeWordBookList(String wordBookListKey) async {
+    state = state.where((word) => !wordBookListKey.contains(word.key)).toList();
     await updateWordBookListInHive(_ref, state);
   }
 

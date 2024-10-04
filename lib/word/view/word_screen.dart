@@ -66,7 +66,7 @@ class _WordScreenState extends ConsumerState<WordScreen> {
     });
   }
 
-// COMP: 아이콘
+// COMP: 앱바 아이콘
   List<Widget> _buildActions() {
     return [
       IconButton(
@@ -90,8 +90,13 @@ class _WordScreenState extends ConsumerState<WordScreen> {
 
   void _navigateToAddWord(int targetIndex) {
     context.go(
-      '/word/${widget.wordBookListKey}/${widget.wordBookKey}/add_word',
-      extra: {'title': '단어 입력하기', 'targetIndex': targetIndex},
+      '/word_book/add',
+      extra: {
+        'wordBookTitle': widget.wordBookTitle,
+        'wordBookKey': widget.wordBookKey,
+        'wordBookListKey': widget.wordBookListKey,
+        'targetIndex': 2,
+      },
     );
   }
 

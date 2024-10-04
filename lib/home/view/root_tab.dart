@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:perfect_memo/common/constant/color.dart';
+import 'package:perfect_memo/common/constant/toast.dart';
 import 'package:perfect_memo/common/layout/default_layout.dart';
 import 'package:go_router/go_router.dart';
 import 'package:perfect_memo/common/provider/word_book_list_provider.dart';
@@ -27,7 +28,7 @@ class _RootTabState extends ConsumerState<RootTab>
   @override
   void initState() {
     super.initState();
-    controller = TabController(length: 3, vsync: this); // 4개의 탭으로 변경
+    controller = TabController(length: 2, vsync: this); // 4개의 탭으로 변경
   }
 
   @override
@@ -82,7 +83,7 @@ class _RootTabState extends ConsumerState<RootTab>
         unselectedLabelStyle: TextStyle(fontSize: 12),
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.book), label: '단어장'),
-          BottomNavigationBarItem(icon: Icon(Icons.quiz), label: '퀴즈'),
+          // BottomNavigationBarItem(icon: Icon(Icons.quiz), label: '퀴즈'),
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: '설정'),
         ],
       ),
@@ -95,16 +96,20 @@ class _RootTabState extends ConsumerState<RootTab>
       child: TabBarView(
         controller: controller,
         children: [
-          ListView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: wordBookListArr.length,
-            itemBuilder: (context, index) {
-              final wordBookList = wordBookListArr[index];
-              return WordBookListCard(wordBookList: wordBookList);
-            },
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: wordBookListArr.length,
+              itemBuilder: (context, index) {
+                final wordBookList = wordBookListArr[index];
+                return WordBookListCard(
+                    wordBookList: wordBookList,
+                    isOnlyOneList: wordBookListArr.length <= 1);
+              },
+            ),
           ),
-          Center(child: Text('퀴즈')), // 퀴즈 탭
           Center(child: Text('설정')), // 설정 탭
         ],
       ),
@@ -115,9 +120,13 @@ class _RootTabState extends ConsumerState<RootTab>
 /// COMP: 리스트 카드
 class WordBookListCard extends ConsumerStatefulWidget {
   final WordBookListModel wordBookList;
+  final bool isOnlyOneList;
 
-  const WordBookListCard({Key? key, required this.wordBookList})
-      : super(key: key);
+  const WordBookListCard({
+    Key? key,
+    required this.wordBookList,
+    required this.isOnlyOneList,
+  }) : super(key: key);
 
   @override
   ConsumerState<WordBookListCard> createState() => _WordBookListCardState();
@@ -128,28 +137,93 @@ class _WordBookListCardState extends ConsumerState<WordBookListCard> {
   final TextEditingController titleController = TextEditingController();
 
   /// COMP: 모달
-  void _showCreateWordBookModal(BuildContext context) {
+  void _showCreateWordBookModal(
+      {required BuildContext context, String? originTitle}) {
+    if (originTitle != null) {
+      titleController.text = originTitle;
+    } else {
+      titleController.text = '';
+    }
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return CustomDialog(
-          btnText: '단어장 만들기',
-          title: '📖 새 단어장 만들기',
+          btnText: originTitle != null ? '수정 하기' : '단어장 만들기',
+          title: originTitle != null ? '✍🏻 단어장 제목 수정' : '📖 새 단어장 만들기',
           child: FloatingLabelTextField(
             label: '단어장 제목',
             controller: titleController,
           ),
           onTap: () {
-            final wordBookKey = generateRandomKey();
-            ref.read(wordBookListProvider.notifier).addWordBook(
-                widget.wordBookList.key, wordBookKey, titleController.text);
+            if (originTitle != null) {
+              ref.read(wordBookListProvider.notifier).changeWordBooListTitle(
+                  widget.wordBookList.key, titleController.text);
+              showCustomToast(context, '변경 완료했어요 💫');
+            } else {
+              final wordBookKey = generateRandomKey();
+              ref.read(wordBookListProvider.notifier).addWordBook(
+                  widget.wordBookList.key, wordBookKey, titleController.text);
+              context.go('/word_book', extra: {
+                'wordBookListKey': widget.wordBookList.key,
+                'wordBookKey': wordBookKey,
+                'wordBookTitle': titleController.text,
+              });
+            }
             Navigator.of(context).pop();
-            context.go('/word_book', extra: {
-              'wordBookListKey': widget.wordBookList.key,
-              'wordBookKey': wordBookKey,
-              'wordBookTitle': titleController.text,
-            });
           },
+        );
+      },
+    );
+  }
+
+  void _deleteWordBookListDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('카테고리 삭제',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20.0,
+              )),
+          content: Text(
+            '정말로 삭제하시겠어요? 삭제하면 카테고리 안에 있는 모든 단어장이 삭제돼요.',
+            style: TextStyle(
+              fontSize: 15.0,
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                '취소',
+                style: TextStyle(
+                  color: BODY_TEXT_COLOR,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text(
+                '삭제',
+                style: TextStyle(
+                  color: Colors.red[600],
+                ),
+              ),
+              onPressed: () {
+                if (widget.isOnlyOneList) {
+                  showCustomToast(context, '카테고리는 적어도 한 개 이상 필요해요.');
+                } else {
+                  ref
+                      .read(wordBookListProvider.notifier)
+                      .removeWordBookList(widget.wordBookList.key);
+                  showCustomToast(context, '삭제를 완료했어요.');
+                }
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
         );
       },
     );
@@ -158,7 +232,7 @@ class _WordBookListCardState extends ConsumerState<WordBookListCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 16, horizontal: 25),
+      margin: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
       elevation: 0, // 그림자 제거
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
@@ -183,17 +257,62 @@ class _WordBookListCardState extends ConsumerState<WordBookListCard> {
                 fontWeight: FontWeight.w500,
               ),
             ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    _showCreateWordBookModal(context);
-                  },
-                  child: Icon(Icons.add),
+            trailing: PopupMenuButton<String>(
+              icon: Icon(Icons.more_vert, color: BODY_TEXT_COLOR),
+              onSelected: (String result) {
+                switch (result) {
+                  case 'add':
+                    _showCreateWordBookModal(context: context);
+                    break;
+                  case 'edit':
+                    _showCreateWordBookModal(
+                        context: context,
+                        originTitle: widget.wordBookList.title);
+                    break;
+                  case 'delete':
+                    _deleteWordBookListDialog();
+                    break;
+                  default:
+                }
+              },
+              color: Colors.white,
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                PopupMenuItem<String>(
+                  value: 'add',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.add,
+                        color: BODY_TEXT_COLOR,
+                      ),
+                      SizedBox(width: 8),
+                      Text('단어장 추가'),
+                    ],
+                  ),
                 ),
-                SizedBox(width: 8),
-                Icon(_isExpanded ? Icons.expand_less : Icons.expand_more),
+                PopupMenuItem<String>(
+                  value: 'edit',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.edit,
+                        color: BODY_TEXT_COLOR,
+                      ),
+                      SizedBox(width: 8),
+                      Text('타이틀 변경'),
+                    ],
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete, color: Colors.red[300]),
+                      SizedBox(width: 8),
+                      Text('단어장 삭제', style: TextStyle(color: Colors.red[300])),
+                    ],
+                  ),
+                ),
               ],
             ),
             onTap: () {

@@ -69,7 +69,7 @@ class _MemoAddWordScreenState extends ConsumerState<MemoAddWordScreen>
   @override
   Widget build(BuildContext context) {
     return DefaultLayout(
-      title: '단어 수정하기',
+      title: widget.wordKey == null ? '단어 추가하기' : '단어 수정하기',
       bottomNavigationBar: widget.wordKey == null
           ? BottomNavigationBar(
               currentIndex: index,

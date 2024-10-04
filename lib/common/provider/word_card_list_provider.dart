@@ -89,7 +89,6 @@ class wordCardListNotifier extends StateNotifier<List<WordCardModel>> {
 
   addCard(String word, String meaning, String pronounce, String format) {
     state = [
-      ...state,
       WordCardModel(
         key: generateRandomKey(),
         word: word,
@@ -97,7 +96,8 @@ class wordCardListNotifier extends StateNotifier<List<WordCardModel>> {
         pronounce: pronounce,
         format: CardFormat.unchecked,
         createdAt: DateTime.now(),
-      )
+      ),
+      ...state,
     ];
     addWordCardListToHive(_ref, wordBookKey, state);
   }

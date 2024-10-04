@@ -1,8 +1,6 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:perfect_memo/common/constant/color.dart';
 import 'package:perfect_memo/common/model/word_book_list_model.dart';
@@ -14,7 +12,6 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:perfect_memo/word/view/word_add_word_screen.dart';
-import 'package:perfect_memo/theme.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:perfect_memo/word/view/word_screen.dart';
 
@@ -104,6 +101,9 @@ class MyApp extends StatelessWidget {
         ),
         splashColor: PRIMARY_COLOR.withOpacity(0.3),
         highlightColor: PRIMARY_COLOR.withOpacity(0.1),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.white,
+        ),
       ),
     );
   }
@@ -139,7 +139,7 @@ final GoRouter _router = GoRouter(
                   wordBookListKey: extra['wordBookListKey']! as String,
                   wordBookTitle: extra['wordBookTitle']! as String,
                   targetIndex: extra['targetIndex'] as int,
-                  wordKey: extra['wordKey']! as String,
+                  wordKey: extra['wordKey'] as String?,
                 );
               },
             ),

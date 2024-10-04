@@ -158,8 +158,7 @@ class CardIcons extends ConsumerWidget {
             onSelected: (String result) {
               switch (result) {
                 case 'edit':
-                  context.go('/word/add', extra: {
-                    'title': '단어 수정하기',
+                  context.go('/word_book/add', extra: {
                     'wordBookTitle': wordBookTitle,
                     'wordBookKey': wordBookKey,
                     'wordBookListKey': wordBookListKey,
@@ -168,52 +167,9 @@ class CardIcons extends ConsumerWidget {
                   });
                   break;
                 case 'delete':
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text('단어 삭제',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20.0,
-                            )),
-                        content: Text(
-                          '정말로 삭제하시겠어요? 외운 단어라면 체크표시를 해두셔도 좋아요.',
-                          style: TextStyle(
-                            fontSize: 15.0,
-                          ),
-                        ),
-                        actions: <Widget>[
-                          TextButton(
-                            child: Text(
-                              '취소',
-                              style: TextStyle(
-                                color: BODY_TEXT_COLOR,
-                              ),
-                            ),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          TextButton(
-                            child: Text(
-                              '삭제',
-                              style: TextStyle(
-                                color: Colors.red[600],
-                              ),
-                            ),
-                            onPressed: () {
-                              ref
-                                  .read(wordCardListProvider(wordBookKey)
-                                      .notifier)
-                                  .removeCard(card.key);
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  );
+                  ref
+                      .read(wordCardListProvider(wordBookKey).notifier)
+                      .removeCard(card.key);
                   break;
                 default:
               }
