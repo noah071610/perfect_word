@@ -12,11 +12,13 @@ class WordList extends ConsumerStatefulWidget {
     Key? key,
     required this.wordBookKey,
     required this.wordBookListKey,
+    required this.wordBookLanguage,
     required this.wordBookTitle,
     required this.cards,
   }) : super(key: key);
 
   final String wordBookKey;
+  final String wordBookLanguage;
   final String wordBookListKey;
   final String wordBookTitle;
   final List<WordCardModel> cards;
@@ -68,6 +70,7 @@ class _WordListState extends ConsumerState<WordList> {
                               wordBookKey: widget.wordBookKey,
                               wordBookListKey: widget.wordBookListKey,
                               wordBookTitle: widget.wordBookTitle,
+                              wordBookLanguage: widget.wordBookLanguage,
                             ),
                           ],
                         ),

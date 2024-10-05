@@ -129,12 +129,14 @@ class CardIcons extends ConsumerWidget {
     required this.wordBookKey,
     required this.wordBookListKey,
     required this.wordBookTitle,
+    required this.wordBookLanguage,
   });
 
   final WordCardModel card;
   final String wordBookKey;
   final String wordBookListKey;
   final String wordBookTitle;
+  final String wordBookLanguage;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -162,6 +164,7 @@ class CardIcons extends ConsumerWidget {
                     'wordBookTitle': wordBookTitle,
                     'wordBookKey': wordBookKey,
                     'wordBookListKey': wordBookListKey,
+                    'wordBookLanguage': wordBookLanguage,
                     'targetIndex': 2,
                     'wordKey': card.key,
                   });

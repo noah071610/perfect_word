@@ -33,10 +33,52 @@ void showCustomToast(BuildContext context, String message) {
   );
 }
 
+FToast? _longPressToast;
+
+void showLongPressToast(BuildContext context, bool isMaskingWord) {
+  _longPressToast = FToast();
+  _longPressToast!.init(context);
+
+  Widget toast = Container(
+    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(25.0),
+      color: const Color(0xFFF5E6D3),
+    ),
+    child: Text(
+      isMaskingWord ? "단어 보기" : "의미 보기",
+      style: const TextStyle(color: Color(0xFF8B4513), fontSize: 16.0),
+    ),
+  );
+
+  _longPressToast!.showToast(
+    child: toast,
+    gravity: ToastGravity.TOP,
+    toastDuration: const Duration(days: 365), // 매우 긴 시간 설정
+    positionedToastBuilder: (context, child) {
+      return Positioned(
+        bottom: 50.0,
+        left: 16.0,
+        right: 16.0,
+        child: _ToastAnimation(child: child, isBottom: true),
+      );
+    },
+  );
+}
+
+void removeLongPressToast() {
+  if (_longPressToast != null) {
+    _longPressToast!.removeQueuedCustomToasts();
+    _longPressToast = null;
+  }
+}
+
 class _ToastAnimation extends StatelessWidget {
   final Widget child;
+  final bool isBottom;
 
-  const _ToastAnimation({Key? key, required this.child}) : super(key: key);
+  const _ToastAnimation({Key? key, required this.child, this.isBottom = false})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +90,7 @@ class _ToastAnimation extends StatelessWidget {
         return Opacity(
           opacity: value,
           child: Transform.translate(
-            offset: Offset(0.0, -50 * (1 - value)),
+            offset: Offset(0.0, (isBottom ? 50 : -50) * (1 - value)),
             child: child,
           ),
         );

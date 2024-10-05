@@ -22,13 +22,15 @@ class WordBookModelAdapter extends TypeAdapter<WordBookModel> {
       createdAt: fields[2] as DateTime,
       wordCount: fields[3] as int,
       checkedWordCount: fields[4] as int,
+      difficultyWordCount: fields[5] as int,
+      language: fields[6] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, WordBookModel obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.key)
       ..writeByte(1)
@@ -38,7 +40,11 @@ class WordBookModelAdapter extends TypeAdapter<WordBookModel> {
       ..writeByte(3)
       ..write(obj.wordCount)
       ..writeByte(4)
-      ..write(obj.checkedWordCount);
+      ..write(obj.checkedWordCount)
+      ..writeByte(5)
+      ..write(obj.difficultyWordCount)
+      ..writeByte(6)
+      ..write(obj.language);
   }
 
   @override
@@ -63,6 +69,8 @@ WordBookModel _$WordBookModelFromJson(Map<String, dynamic> json) =>
       createdAt: DateTime.parse(json['createdAt'] as String),
       wordCount: (json['wordCount'] as num).toInt(),
       checkedWordCount: (json['checkedWordCount'] as num).toInt(),
+      difficultyWordCount: (json['difficultyWordCount'] as num).toInt(),
+      language: json['language'] as String,
     );
 
 Map<String, dynamic> _$WordBookModelToJson(WordBookModel instance) =>
@@ -72,4 +80,6 @@ Map<String, dynamic> _$WordBookModelToJson(WordBookModel instance) =>
       'createdAt': instance.createdAt.toIso8601String(),
       'wordCount': instance.wordCount,
       'checkedWordCount': instance.checkedWordCount,
+      'difficultyWordCount': instance.difficultyWordCount,
+      'language': instance.language,
     };

@@ -26,12 +26,22 @@ class WordBookModel {
   @HiveField(4)
   final int checkedWordCount;
 
+  @JsonKey()
+  @HiveField(5)
+  final int difficultyWordCount;
+
+  @JsonKey()
+  @HiveField(6)
+  final String language;
+
   WordBookModel({
     required this.key,
     required this.title,
     required this.createdAt,
     required this.wordCount,
     required this.checkedWordCount,
+    required this.difficultyWordCount,
+    required this.language,
   });
 
   factory WordBookModel.fromJson(Map<String, dynamic> json) =>
@@ -46,6 +56,8 @@ class WordBookModel {
     String? category,
     int? wordCount,
     int? checkedWordCount,
+    int? difficultyWordCount,
+    String? language,
   }) {
     return WordBookModel(
       key: key ?? this.key,
@@ -53,6 +65,8 @@ class WordBookModel {
       createdAt: createdAt ?? this.createdAt,
       wordCount: wordCount ?? this.wordCount,
       checkedWordCount: checkedWordCount ?? this.checkedWordCount,
+      difficultyWordCount: difficultyWordCount ?? this.difficultyWordCount,
+      language: language ?? this.language,
     );
   }
 }

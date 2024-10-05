@@ -67,15 +67,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       routerConfig: _router,
-      title: 'Perfect Memo',
+      title: 'Perfect Word-Book',
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white,
         fontFamily: 'NotoSansKR',
         dialogTheme: DialogTheme(
-          backgroundColor: Colors.white, // 다이얼로그 배경색
+          backgroundColor: Colors.white, // 다이얼로그 배��색
         ),
         appBarTheme: AppBarTheme(
           backgroundColor: PRIMARY_SOFT_COLOR,
+          surfaceTintColor: Colors.transparent,
         ),
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
           backgroundColor: PRIMARY_SOFT_COLOR,
@@ -98,11 +99,21 @@ class MyApp extends StatelessWidget {
             ),
           ),
           indicatorSize: TabBarIndicatorSize.tab,
+          overlayColor: WidgetStateProperty.resolveWith<Color?>(
+            (Set<WidgetState> states) {
+              if (states.contains(WidgetState.pressed)) {
+                return PRIMARY_COLOR.withOpacity(0.6);
+              }
+              return null;
+            },
+          ),
         ),
+        splashFactory: InkRipple.splashFactory,
         splashColor: PRIMARY_COLOR.withOpacity(0.3),
         highlightColor: PRIMARY_COLOR.withOpacity(0.1),
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.white,
+          surface: Colors.white,
         ),
       ),
     );
@@ -126,6 +137,7 @@ final GoRouter _router = GoRouter(
               wordBookKey: extra['wordBookKey']! as String,
               wordBookListKey: extra['wordBookListKey']! as String,
               wordBookTitle: extra['wordBookTitle']! as String,
+              wordBookLanguage: extra['wordBookLanguage']! as String,
             );
           },
           routes: [
@@ -140,6 +152,7 @@ final GoRouter _router = GoRouter(
                   wordBookTitle: extra['wordBookTitle']! as String,
                   targetIndex: extra['targetIndex'] as int,
                   wordKey: extra['wordKey'] as String?,
+                  wordBookLanguage: extra['wordBookLanguage']! as String,
                 );
               },
             ),

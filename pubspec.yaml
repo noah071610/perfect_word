@@ -42,9 +42,7 @@ dependencies:
   animated_emoji: ^3.1.0
   intl: ^0.19.0
   fluttertoast: ^8.2.8
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
+  flag: ^7.0.0
   cupertino_icons: ^1.0.8
   flutter_keyboard_visibility: ^6.0.0
   flutter_card_swiper: ^7.0.1

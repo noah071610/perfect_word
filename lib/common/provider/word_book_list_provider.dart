@@ -21,7 +21,8 @@ class wordBookListNotifier extends StateNotifier<List<WordBookListModel>> {
     state = loadedList;
   }
 
-  Future<void> addWordBook(String listKey, String bookKey, String title) async {
+  Future<void> addWordBook(String listKey, String bookKey, String title,
+      String languageValue) async {
     final newWordBookList = state
         .map((e) => e.key == listKey
             ? e.copyWith(bookList: [
@@ -32,6 +33,8 @@ class wordBookListNotifier extends StateNotifier<List<WordBookListModel>> {
                   createdAt: DateTime.now(),
                   checkedWordCount: 0,
                   wordCount: 0,
+                  difficultyWordCount: 0,
+                  language: languageValue,
                 )
               ])
             : e)
@@ -46,7 +49,7 @@ class wordBookListNotifier extends StateNotifier<List<WordBookListModel>> {
       title: title,
       bookList: [],
     );
-    state = [...state, newWordBookList];
+    state = [newWordBookList, ...state];
     await updateWordBookListInHive(_ref, state);
   }
 
@@ -83,22 +86,6 @@ class wordBookListNotifier extends StateNotifier<List<WordBookListModel>> {
         .map((book) =>
             book.key == wordBookListKey ? book.copyWith(title: newTitle) : book)
         .toList();
-    await updateWordBookListInHive(_ref, state);
-  }
-
-  Future<void> addWordBookWordCount(String key) async {
-    state = state.map((wordBookList) {
-      return wordBookList.copyWith(
-        bookList: wordBookList.bookList.map((wordBook) {
-          if (wordBook.key == key) {
-            return wordBook.copyWith(
-              wordCount: wordBook.wordCount + 1,
-            );
-          }
-          return wordBook;
-        }).toList(),
-      );
-    }).toList();
     await updateWordBookListInHive(_ref, state);
   }
 }

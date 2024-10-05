@@ -45,7 +45,11 @@ List<WordCardModel> _filterAndSortWordCards(
       break;
     case CardSortType.difficulty:
       filteredCards.sort((a, b) {
-        if (a.format == CardFormat.difficulty &&
+        if (a.format == CardFormat.memorized) {
+          return 1;
+        } else if (b.format == CardFormat.memorized) {
+          return -1;
+        } else if (a.format == CardFormat.difficulty &&
             b.format != CardFormat.difficulty) {
           return -1;
         } else if (a.format != CardFormat.difficulty &&
@@ -97,6 +101,14 @@ class wordCardListNotifier extends StateNotifier<List<WordCardModel>> {
         format: CardFormat.unchecked,
         createdAt: DateTime.now(),
       ),
+      ...state,
+    ];
+    addWordCardListToHive(_ref, wordBookKey, state);
+  }
+
+  addGeneratedCards(List<WordCardModel> cards) {
+    state = [
+      ...cards,
       ...state,
     ];
     addWordCardListToHive(_ref, wordBookKey, state);

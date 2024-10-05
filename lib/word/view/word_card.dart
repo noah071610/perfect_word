@@ -101,7 +101,8 @@ class _WordSliderCardState extends ConsumerState<WordSliderCard>
                     SizedBox(height: 16),
                     Text(
                       card.meaning,
-                      style: TextStyle(fontSize: 20),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -161,7 +162,7 @@ class _WordSliderCardState extends ConsumerState<WordSliderCard>
                   setState(() {
                     curIndex = currentIndex ?? 0;
                   });
-                  return true; // 스와이프 허용
+                  return true; // 재생 중이 아닐 때 스와이프 허용
                 },
                 numberOfCardsDisplayed:
                     widget.cards.length > 2 ? 3 : widget.cards.length,
@@ -191,9 +192,11 @@ class _WordSliderCardState extends ConsumerState<WordSliderCard>
                 color: BODY_TEXT_COLOR,
               ),
               IconButton(
-                icon: Icon(isPlaying
-                    ? CupertinoIcons.pause_fill
-                    : CupertinoIcons.play_fill),
+                icon: Icon(
+                  isPlaying
+                      ? CupertinoIcons.pause_fill
+                      : CupertinoIcons.play_fill,
+                ),
                 onPressed: _toggleAutoPlay,
                 color: isPlaying ? Colors.redAccent : BODY_TEXT_COLOR,
               ),

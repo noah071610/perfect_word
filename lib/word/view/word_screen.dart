@@ -22,12 +22,14 @@ class WordScreen extends ConsumerStatefulWidget {
   final String wordBookListKey;
   final String wordBookKey;
   final String wordBookTitle;
+  final String wordBookLanguage;
 
   const WordScreen({
     super.key,
     required this.wordBookKey,
     required this.wordBookListKey,
     required this.wordBookTitle,
+    required this.wordBookLanguage,
   });
 
   @override
@@ -38,6 +40,7 @@ class _WordScreenState extends ConsumerState<WordScreen> {
   final TextEditingController searchController = TextEditingController();
   Timer? _debounce;
   bool _isLoading = false;
+  bool _isFocused = false; // 포커스 상태를 추적하기 위한 변수 추가
 
   @override
   void initState() {
@@ -67,16 +70,18 @@ class _WordScreenState extends ConsumerState<WordScreen> {
   }
 
 // COMP: 앱바 아이콘
-  List<Widget> _buildActions() {
+  List<Widget> _buildActions(bool isSystemWordBook) {
     return [
-      IconButton(
-        icon: const Icon(Icons.add),
-        onPressed: () => _navigateToAddWord(2),
-      ),
-      IconButton(
-        icon: const Icon(Icons.auto_fix_high),
-        onPressed: () => _navigateToAddWord(0),
-      ),
+      if (!isSystemWordBook)
+        IconButton(
+          icon: const Icon(Icons.add),
+          onPressed: () => _navigateToAddWord(2),
+        ),
+      if (!isSystemWordBook)
+        IconButton(
+          icon: const Icon(Icons.auto_fix_high),
+          onPressed: () => _navigateToAddWord(0),
+        ),
       IconButton(
         icon: const Icon(CupertinoIcons.repeat),
         onPressed: _shuffleCards,
@@ -95,7 +100,8 @@ class _WordScreenState extends ConsumerState<WordScreen> {
         'wordBookTitle': widget.wordBookTitle,
         'wordBookKey': widget.wordBookKey,
         'wordBookListKey': widget.wordBookListKey,
-        'targetIndex': 2,
+        'wordBookLanguage': widget.wordBookLanguage,
+        'targetIndex': targetIndex,
       },
     );
   }
@@ -157,18 +163,23 @@ class _WordScreenState extends ConsumerState<WordScreen> {
     final cards = ref.watch(filteredWordCardListProvider(widget.wordBookKey));
     final filter = ref.watch(wordFilterProvider);
 
+    final bool isSystemWordBook =
+        widget.wordBookKey == 'difficulty' || widget.wordBookKey == 'checked';
+
     return filter.layoutType == CardLayoutType.list
         ? SliverLayout(
             title: widget.wordBookTitle,
-            onClickTitle: () =>
-                {_showTitleChangeDialog(context, ref, widget.wordBookTitle)},
+            onClickTitle: () => {
+              if (!isSystemWordBook)
+                _showTitleChangeDialog(context, ref, widget.wordBookTitle)
+            },
             bottom: PreferredSize(
               preferredSize: Size.fromHeight(45.0),
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 18.0, vertical: 5.0),
+                    padding: const EdgeInsets.only(
+                        left: 18.0, top: 5.0, bottom: 5.0),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -177,14 +188,31 @@ class _WordScreenState extends ConsumerState<WordScreen> {
                           width: 10,
                         ),
                         Expanded(
-                          child: TextField(
-                            controller: searchController,
-                            decoration: InputDecoration(
-                              hintText: '검색어를 입력하세요',
-                              border: InputBorder.none,
+                          child: Focus(
+                            onFocusChange: (hasFocus) {
+                              setState(() {
+                                _isFocused = hasFocus;
+                              });
+                            },
+                            child: TextField(
+                              controller: searchController,
+                              decoration: InputDecoration(
+                                hintText: '검색어를 입력하세요',
+                                border: InputBorder.none,
+                              ),
                             ),
                           ),
                         ),
+                        if (_isFocused && searchController.text.isNotEmpty)
+                          IconButton(
+                            icon: Icon(CupertinoIcons.clear_circled,
+                                color: BODY_TEXT_COLOR),
+                            onPressed: () {
+                              setState(() {
+                                searchController.clear();
+                              });
+                            },
+                          ),
                       ],
                     ),
                   ),
@@ -205,20 +233,24 @@ class _WordScreenState extends ConsumerState<WordScreen> {
                 wordBookKey: widget.wordBookKey,
                 wordBookListKey: widget.wordBookListKey,
                 wordBookTitle: widget.wordBookTitle,
+                wordBookLanguage: widget.wordBookLanguage,
                 cards: cards,
               ),
             ],
-            actions: _buildActions(),
+            actions: _buildActions(isSystemWordBook),
           )
         : DefaultLayout(
             title: widget.wordBookTitle,
-            onClickTitle: () =>
-                {_showTitleChangeDialog(context, ref, widget.wordBookTitle)},
-            actions: _buildActions(),
+            onClickTitle: () => {
+              if (!isSystemWordBook)
+                _showTitleChangeDialog(context, ref, widget.wordBookTitle)
+            },
+            actions: _buildActions(isSystemWordBook),
             child: filter.layoutType == CardLayoutType.grid
                 ? WordGrid(
                     cards: cards,
                     wordBookKey: widget.wordBookKey,
+                    isMaskingWord: filter.maskingType == CardMaskingType.word,
                   )
                 : cards.isNotEmpty
                     ? WordSliderCard(

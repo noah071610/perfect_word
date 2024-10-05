@@ -30,3 +30,21 @@ final pastelColors = [
   Color.fromRGBO(255, 235, 235, 1).value, // 연한 분홍색 (풍선)
   Color.fromRGBO(245, 240, 255, 1).value, // 연한 라벤더색 (유니콘)
 ];
+
+final languages = [
+  {"label": "English", "value": "GB"},
+  {"label": "Español", "value": "ES"},
+  {"label": "中文", "value": "CN"},
+  {"label": "Français", "value": "FR"},
+  {"label": "Deutsch", "value": "DE"},
+  {"label": "日本語", "value": "JP"},
+  {"label": "한국어", "value": "KR"},
+  {"label": "Português", "value": "PT"},
+  {"label": "Italiano", "value": "IT"},
+  {"label": "Русский", "value": "RU"},
+  {"label": "ไทย", "value": "TH"},
+  {"label": "Tiếng Việt", "value": "VN"},
+  {"label": "Bahasa Indonesia", "value": "ID"},
+  {"label": "हिन्दी", "value": "IN"},
+  {"label": "العربية", "value": "SA"}
+];

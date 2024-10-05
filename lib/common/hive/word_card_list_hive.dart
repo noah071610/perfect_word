@@ -3,7 +3,7 @@ import 'package:perfect_memo/common/hive/hive.dart';
 import 'package:perfect_memo/common/model/word_card_model.dart';
 
 Future<List<WordCardModel>> loadWordCardListFromHive(
-    Ref<Object?> ref, String wordBookKey) async {
+    Ref ref, String wordBookKey) async {
   final key = 'word_card_list_$wordBookKey';
   final box = await ref.read(boxProvider(key).future);
   final List<dynamic> _wordCardList = box.get(key, defaultValue: []);

@@ -1,18 +1,24 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:perfect_memo/common/constant/color.dart';
 import 'package:perfect_memo/common/constant/toast.dart';
 import 'package:perfect_memo/common/layout/default_layout.dart';
+import 'package:perfect_memo/common/model/word_card_model.dart';
 import 'package:perfect_memo/common/provider/word_card_list_provider.dart';
 import 'package:perfect_memo/common/provider/word_book_list_provider.dart';
+import 'package:perfect_memo/common/utils/utils.dart';
 import 'package:perfect_memo/common/widgets/custom_button.dart';
 import 'package:perfect_memo/common/widgets/floating_label_text_field.dart';
+import 'package:dio/dio.dart';
+import 'dart:convert';
 
 class MemoAddWordScreen extends ConsumerStatefulWidget {
   final String wordBookKey;
   final String wordBookListKey;
   final String wordBookTitle;
+  final String wordBookLanguage;
   final int targetIndex;
   final String? wordKey;
 
@@ -21,6 +27,7 @@ class MemoAddWordScreen extends ConsumerStatefulWidget {
     required this.wordBookListKey,
     required this.wordBookKey,
     required this.wordBookTitle,
+    required this.wordBookLanguage,
     required this.targetIndex,
     this.wordKey,
   });
@@ -39,6 +46,9 @@ class _MemoAddWordScreenState extends ConsumerState<MemoAddWordScreen>
   final TextEditingController aiWordGenerationController =
       TextEditingController();
   int index = 0;
+  bool _isLoading = false;
+  List<WordCardModel> generatedCards = [];
+  List<bool> selectedCards = [];
 
   @override
   void initState() {
@@ -61,9 +71,70 @@ class _MemoAddWordScreenState extends ConsumerState<MemoAddWordScreen>
     });
   }
 
-  void onSubmitAiForm(AddWordType type) {
-    if (type == AddWordType.generate) {
-    } else {}
+  void addGeneratedWords(AddWordType type) async {
+    final List<WordCardModel> finalCards = generatedCards
+        .where((card) => selectedCards[generatedCards.indexOf(card)])
+        .toList();
+    await ref
+        .read(wordCardListProvider(widget.wordBookKey).notifier)
+        .addGeneratedCards(finalCards);
+
+    showCustomToast(context, '단어를 추가했어요! 🚀');
+
+    context.go('/word_book', extra: {
+      'wordBookListKey': widget.wordBookListKey,
+      'wordBookKey': widget.wordBookKey,
+      'wordBookTitle': widget.wordBookTitle,
+      'wordBookLanguage': widget.wordBookLanguage,
+    });
+  }
+
+  void generateWords(AddWordType type) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final dio = Dio();
+
+      final bool isExtract = type == AddWordType.extract;
+      final String path = isExtract ? 'extract' : 'generate';
+      final response = await dio.post(
+        'http://localhost:5555/api/vote/$path?language=${widget.wordBookLanguage}',
+        data: {
+          'userText': isExtract
+              ? aiWordExtractionController.text
+              : aiWordGenerationController.text
+        },
+      );
+
+      if (response.data != null) {
+        final Map<String, dynamic> jsonData = json.decode(response.data);
+        final List<dynamic> wordsData = jsonData['words'];
+
+        setState(() {
+          generatedCards = wordsData
+              .map((e) => WordCardModel(
+                    key: generateRandomKey(),
+                    word: (e['word'] as String).replaceAll('_', ' '),
+                    meaning: e['meaning'] as String,
+                    pronounce: '',
+                    format: CardFormat.unchecked,
+                    createdAt: DateTime.now(),
+                  ))
+              .toList();
+          selectedCards = List.generate(wordsData.length, (int index) => true);
+        });
+      } else {
+        showCustomToast(context, 'AI 단어 추출에 실패했습니다.');
+      }
+    } catch (e) {
+      showCustomToast(context, 'AI 단어 처리 중 오류가 발생했습니다.');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -97,7 +168,7 @@ class _MemoAddWordScreenState extends ConsumerState<MemoAddWordScreen>
           : null,
       child: TabBarView(
         controller: controller,
-        physics: NeverScrollableScrollPhysics(), // 여기에 추가
+        physics: NeverScrollableScrollPhysics(),
         children: [
           AIWordForm(
             title: 'AI 단어 추출',
@@ -105,9 +176,15 @@ class _MemoAddWordScreenState extends ConsumerState<MemoAddWordScreen>
             hintText: '텍스트를 입력하세요 (예: 노래 가사, 블로그 글...)',
             controller: aiWordExtractionController,
             wordBookKey: widget.wordBookKey,
-            onSubmit: () {
-              onSubmitAiForm(AddWordType.extract);
+            generateWords: () {
+              generateWords(AddWordType.extract);
             },
+            addGeneratedWords: () {
+              addGeneratedWords(AddWordType.extract);
+            },
+            isLoading: _isLoading,
+            generatedCards: generatedCards,
+            selectedCards: selectedCards,
           ),
           AIWordForm(
             title: 'AI 문맥 단어 생성',
@@ -115,15 +192,22 @@ class _MemoAddWordScreenState extends ConsumerState<MemoAddWordScreen>
             hintText: '문맥을 입력하세요 (예: 뉴욕 파스타 레스토랑에서 손님으로 대화 할 때 유용한 단어를 알려줘)',
             controller: aiWordGenerationController,
             wordBookKey: widget.wordBookKey,
-            onSubmit: () {
-              onSubmitAiForm(AddWordType.generate);
+            generateWords: () {
+              generateWords(AddWordType.generate);
             },
+            addGeneratedWords: () {
+              addGeneratedWords(AddWordType.extract);
+            },
+            isLoading: _isLoading,
+            generatedCards: generatedCards,
+            selectedCards: selectedCards,
           ),
           ManualInputForm(
             wordBookKey: widget.wordBookKey,
             wordBookListKey: widget.wordBookListKey,
             wordKey: widget.wordKey,
             wordBookTitle: widget.wordBookTitle,
+            wordBookLanguage: widget.wordBookLanguage,
             context: context,
           ),
         ],
@@ -143,6 +227,7 @@ class ManualInputForm extends ConsumerWidget {
   final String wordBookKey;
   final String wordBookListKey;
   final String wordBookTitle;
+  final String wordBookLanguage;
   final String? wordKey;
 
   ManualInputForm({
@@ -150,6 +235,7 @@ class ManualInputForm extends ConsumerWidget {
     required this.wordBookListKey,
     required this.wordBookKey,
     required this.wordBookTitle,
+    required this.wordBookLanguage,
     required this.context,
     this.wordKey,
   }) : super(key: key);
@@ -166,11 +252,13 @@ class ManualInputForm extends ConsumerWidget {
               meaning: meaningController.text,
               pronounce: pronounceController.text,
             );
+
         showCustomToast(context, '변경 완료했어요 💫');
         context.go('/word_book', extra: {
           'wordBookListKey': wordBookListKey,
           'wordBookKey': wordBookKey,
           'wordBookTitle': wordBookTitle,
+          'wordBookLanguage': wordBookLanguage,
         });
       } else {
         // 새 단어 카드 추가
@@ -180,9 +268,6 @@ class ManualInputForm extends ConsumerWidget {
               pronounceController.text,
               'default',
             );
-        ref
-            .read(wordBookListProvider.notifier)
-            .addWordBookWordCount(wordBookKey);
 
         wordController.text = '';
         meaningController.text = '';
@@ -262,14 +347,18 @@ class ManualInputForm extends ConsumerWidget {
   }
 }
 
-class AIWordForm extends StatelessWidget {
+// COMP: AI WORD
+class AIWordForm extends ConsumerStatefulWidget {
   final String title;
   final String description;
   final String hintText;
   final String wordBookKey;
-  final VoidCallback onSubmit;
+  final VoidCallback generateWords;
+  final VoidCallback addGeneratedWords;
   final TextEditingController controller;
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final bool isLoading;
+  final List<WordCardModel> generatedCards;
+  final List<bool> selectedCards;
 
   AIWordForm({
     Key? key,
@@ -277,9 +366,30 @@ class AIWordForm extends StatelessWidget {
     required this.description,
     required this.hintText,
     required this.wordBookKey,
-    required this.onSubmit,
+    required this.generateWords,
     required this.controller,
+    required this.isLoading,
+    required this.generatedCards,
+    required this.selectedCards,
+    required this.addGeneratedWords,
   }) : super(key: key);
+
+  @override
+  ConsumerState createState() => _AIWordFormState();
+}
+
+class _AIWordFormState extends ConsumerState<AIWordForm> {
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final GlobalKey<FormFieldState<String>> _textFieldKey =
+      GlobalKey<FormFieldState<String>>();
+
+  void _validateAndSubmit(BuildContext context) {
+    if (_textFieldKey.currentState!.validate()) {
+      widget.generateWords();
+    } else {
+      showCustomToast(context, '텍스트를 입력해주세요.');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -291,14 +401,14 @@ class AIWordForm extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              title,
+              widget.title,
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
-              description,
+              widget.description,
               style: TextStyle(
                 fontSize: 15,
                 color: BODY_TEXT_COLOR,
@@ -311,37 +421,119 @@ class AIWordForm extends StatelessWidget {
             ),
             SizedBox(height: 10),
             Expanded(
-              child: TextField(
-                controller: controller,
-                decoration: InputDecoration(
-                  hintText: hintText,
-                  hintStyle: TextStyle(
-                    color: BODY_TEXT_COLOR,
-                  ),
-                  border: InputBorder.none,
-                  counterText: null,
-                ),
-                maxLines: null,
-                expands: true,
-                maxLength: 1000,
-                buildCounter: (
-                  BuildContext context, {
-                  required int currentLength,
-                  required int? maxLength,
-                  required bool isFocused,
-                }) {
-                  return Text(
-                    '$currentLength / $maxLength',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: BODY_TEXT_COLOR,
+              child: (widget.generatedCards.isEmpty ||
+                      widget.selectedCards.isEmpty)
+                  ? TextFormField(
+                      key: _textFieldKey,
+                      controller: widget.controller,
+                      decoration: InputDecoration(
+                        hintText: widget.hintText,
+                        hintStyle: TextStyle(
+                          color: BODY_TEXT_COLOR,
+                        ),
+                        border: InputBorder.none,
+                        counterText: null,
+                      ),
+                      maxLines: null,
+                      expands: true,
+                      maxLength: 1000,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return '텍스트를 입력해주세요.';
+                        }
+                        return null;
+                      },
+                      buildCounter: (
+                        BuildContext context, {
+                        required int currentLength,
+                        required int? maxLength,
+                        required bool isFocused,
+                      }) {
+                        return Text(
+                          '$currentLength / $maxLength',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: BODY_TEXT_COLOR,
+                          ),
+                        );
+                      },
+                    )
+                  : ListView.builder(
+                      itemCount: widget.generatedCards.length,
+                      itemBuilder: (context, index) {
+                        final card = widget.generatedCards[index];
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: IntrinsicHeight(
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        card.word,
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          decoration:
+                                              widget.selectedCards[index]
+                                                  ? TextDecoration.none
+                                                  : TextDecoration.lineThrough,
+                                          color: widget.selectedCards[index]
+                                              ? Colors.black
+                                              : BODY_TEXT_COLOR,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                    SizedBox(width: 12),
+                                    Flexible(
+                                      child: Text(
+                                        card.meaning,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: BODY_TEXT_COLOR,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                widget.selectedCards[index]
+                                    ? CupertinoIcons.delete
+                                    : CupertinoIcons.plus_app,
+                                size: 20,
+                                color: widget.selectedCards[index]
+                                    ? Colors.red[400]
+                                    : Colors.green,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  widget.selectedCards[index] =
+                                      !widget.selectedCards[index];
+                                });
+                              },
+                            ),
+                          ],
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
             SizedBox(height: 30),
-            CustomButton(onSubmit: onSubmit, text: '자동 생성하기'),
+            CustomButton(
+              onSubmit: widget.generatedCards.isEmpty
+                  ? () => _validateAndSubmit(context)
+                  : widget.addGeneratedWords,
+              text: widget.generatedCards.isEmpty ? '자동 생성하기' : '단어장에 추가하기',
+              isLoading: widget.isLoading,
+            ),
           ],
         ),
       ),
