@@ -17,12 +17,12 @@ class WordBookListModel {
 
   @JsonKey()
   @HiveField(2)
-  final List<WordBookModel> bookList;
+  final List<WordBookModel> wordBookList;
 
   WordBookListModel({
     required this.key,
     required this.title,
-    required this.bookList,
+    required this.wordBookList,
   });
 
   factory WordBookListModel.fromJson(Map<String, dynamic> json) =>
@@ -33,12 +33,12 @@ class WordBookListModel {
   WordBookListModel copyWith({
     String? key,
     String? title,
-    List<WordBookModel>? bookList,
+    List<WordBookModel>? wordBookList,
   }) {
     return WordBookListModel(
       key: key ?? this.key,
       title: title ?? this.title,
-      bookList: bookList ?? this.bookList,
+      wordBookList: wordBookList ?? this.wordBookList,
     );
   }
 }

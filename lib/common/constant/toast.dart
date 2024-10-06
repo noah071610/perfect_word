@@ -1,7 +1,11 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-void showCustomToast(BuildContext context, String message) {
+void showCustomToast(
+    {required BuildContext context,
+    required String message,
+    bool isError = false}) {
   FToast fToast = FToast();
   fToast.init(context);
 
@@ -9,11 +13,13 @@ void showCustomToast(BuildContext context, String message) {
     padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(25.0),
-      color: const Color(0xFFF5E6D3),
+      color: isError ? const Color(0xFFFFE6E6) : const Color(0xFFF5E6D3),
     ),
     child: Text(
       message,
-      style: const TextStyle(color: Color(0xFF8B4513), fontSize: 16.0),
+      style: TextStyle(
+          color: isError ? const Color(0xFFB71C1C) : const Color(0xFF8B4513),
+          fontSize: 16.0),
     ),
   );
 
@@ -46,7 +52,7 @@ void showLongPressToast(BuildContext context, bool isMaskingWord) {
       color: const Color(0xFFF5E6D3),
     ),
     child: Text(
-      isMaskingWord ? "단어 보기" : "의미 보기",
+      isMaskingWord ? context.tr("view_word") : context.tr("view_meaning"),
       style: const TextStyle(color: Color(0xFF8B4513), fontSize: 16.0),
     ),
   );

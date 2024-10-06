@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:perfect_memo/common/constant/color.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:perfect_memo/common/theme/custom_colors.dart';
 
 class CustomDialog extends ConsumerWidget {
   final String title;
@@ -21,6 +22,8 @@ class CustomDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final CustomColors? theme = Theme.of(context).extension<CustomColors>();
+
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(25),
@@ -99,7 +102,7 @@ class CustomDialog extends ConsumerWidget {
                   onTap: onTap,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: PRIMARY_COLOR, // 라벤더 파스텔 색상 유지
+                      color: theme?.buttonBackground, // 라벤더 파스텔 색상 유지
                       borderRadius: BorderRadius.only(
                         bottomLeft: Radius.circular(20),
                         bottomRight: Radius.circular(20),
@@ -110,9 +113,9 @@ class CustomDialog extends ConsumerWidget {
                       child: Text(
                         btnText,
                         style: TextStyle(
-                          color: BUTTON_TEXT_COLOR,
+                          color: theme?.buttonTextColor,
                           fontSize: 16.0,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),

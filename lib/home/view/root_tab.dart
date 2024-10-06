@@ -1,18 +1,15 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:perfect_memo/common/constant/color.dart';
 import 'package:perfect_memo/common/constant/toast.dart';
 import 'package:perfect_memo/common/layout/default_layout.dart';
-import 'package:go_router/go_router.dart';
 import 'package:perfect_memo/common/provider/word_book_list_provider.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:perfect_memo/common/model/word_book_list_model.dart';
-import 'package:perfect_memo/common/model/word_book_model.dart';
 import 'package:perfect_memo/common/utils/utils.dart';
-import 'package:perfect_memo/common/widgets/country_image.dart';
 import 'package:perfect_memo/common/widgets/custom_dialog.dart';
 import 'package:perfect_memo/common/widgets/floating_label_text_field.dart';
-import 'package:perfect_memo/common/constant/data.dart';
+import 'package:perfect_memo/home/view/setting_screen.dart';
+import 'package:perfect_memo/home/view/word_book_list_card.dart';
 
 class RootTab extends ConsumerStatefulWidget {
   const RootTab({super.key});
@@ -51,18 +48,27 @@ class _RootTabState extends ConsumerState<RootTab>
       context: context,
       builder: (BuildContext context) {
         return CustomDialog(
-          btnText: '카테고리 만들기',
-          title: '🔖 새 카테고리 만들기',
+          btnText: context.tr('create_category'),
+          title: context.tr('new_category_title'),
           child: FloatingLabelTextField(
-            label: '카테고리 제목',
+            label: context.tr('category_title'),
             controller: titleController,
           ),
           onTap: () async {
+            if (titleController.text.isEmpty) {
+              showCustomToast(
+                  context: context,
+                  message: context.tr('enter_title'),
+                  isError: true);
+              return;
+            }
             final wordBookListKey = generateRandomKey();
             await ref
                 .read(wordBookListProvider.notifier)
                 .addWordBookList(wordBookListKey, titleController.text);
-            showCustomToast(context, '새로운 카테고리를 만들었어요!');
+            showCustomToast(
+                context: context, message: context.tr('new_category_created'));
+            titleController.text = '';
             Navigator.of(context).pop();
           },
         );
@@ -75,7 +81,8 @@ class _RootTabState extends ConsumerState<RootTab>
     final wordBookListArr = ref.watch(wordBookListProvider);
 
     return DefaultLayout(
-      title: '메인 페이지',
+      title: index == 1 ? context.tr('setting') : context.tr('main_page'),
+      centerTitle: index == 1 ? true : false,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: index,
         onTap: _onTabTapped,
@@ -85,17 +92,20 @@ class _RootTabState extends ConsumerState<RootTab>
         selectedLabelStyle: TextStyle(fontSize: 12),
         unselectedLabelStyle: TextStyle(fontSize: 12),
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.book), label: '단어장'),
-          // BottomNavigationBarItem(icon: Icon(Icons.quiz), label: '퀴즈'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: '설정'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.book), label: context.tr('word_book')),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.settings), label: context.tr('setting')),
         ],
       ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.add),
-          onPressed: () => _showCreateWordBookListModal(context),
-        ),
-      ],
+      actions: index == 1
+          ? null
+          : [
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () => _showCreateWordBookListModal(context),
+              ),
+            ],
       child: TabBarView(
         controller: controller,
         children: [
@@ -114,373 +124,9 @@ class _RootTabState extends ConsumerState<RootTab>
               },
             ),
           ),
-          Center(child: Text('설정')), // 설정 탭
+          SettingScreen(),
         ],
       ),
-    );
-  }
-}
-
-/// COMP: 리스트 카드
-class WordBookListCard extends ConsumerStatefulWidget {
-  final WordBookListModel wordBookList;
-  final bool isOnlyOneList;
-  final bool isSystemWordBookListCard;
-
-  const WordBookListCard({
-    Key? key,
-    required this.wordBookList,
-    required this.isOnlyOneList,
-    required this.isSystemWordBookListCard,
-  }) : super(key: key);
-
-  @override
-  ConsumerState<WordBookListCard> createState() => _WordBookListCardState();
-}
-
-class _WordBookListCardState extends ConsumerState<WordBookListCard> {
-  bool _isExpanded = true;
-  final TextEditingController titleController = TextEditingController();
-  String selectedLanguage = 'GB'; // 기본값으로 영국 국기 설정
-
-  /// COMP: 모달
-  void _showCreateWordBookModal(
-      {required BuildContext context, String? originTitle}) {
-    if (originTitle != null) {
-      titleController.text = originTitle;
-    } else {
-      titleController.text = '';
-    }
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return CustomDialog(
-          btnText: originTitle != null ? '수정 하기' : '단어장 만들기',
-          title: originTitle != null ? '✍🏻 단어장 제목 수정' : '📖 새 단어장 만들기',
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              FloatingLabelTextField(
-                label: '단어장 제목',
-                controller: titleController,
-              ),
-              SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: selectedLanguage,
-                decoration: InputDecoration(
-                  labelText: '언어 선택',
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey.shade400),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: BUTTON_TEXT_COLOR),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: BUTTON_TEXT_COLOR, width: 1),
-                  ),
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
-                  labelStyle: TextStyle(
-                    fontSize: 20.0,
-                    color: BUTTON_TEXT_COLOR,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                style: TextStyle(color: Colors.black, fontSize: 16),
-                icon: Icon(Icons.arrow_drop_down, color: BUTTON_TEXT_COLOR),
-                items: languages.map((language) {
-                  return DropdownMenuItem<String>(
-                    value: language['value'],
-                    child: Row(
-                      children: [
-                        CountryImage(
-                          language: language['value']!,
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          language['label']!,
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedLanguage = newValue!;
-                  });
-                },
-              ),
-            ],
-          ),
-          onTap: () {
-            if (originTitle != null) {
-              ref.read(wordBookListProvider.notifier).changeWordBooListTitle(
-                  widget.wordBookList.key, titleController.text);
-              showCustomToast(context, '변경 완료했어요 💫');
-            } else {
-              final wordBookKey = generateRandomKey();
-              ref.read(wordBookListProvider.notifier).addWordBook(
-                  widget.wordBookList.key,
-                  wordBookKey,
-                  titleController.text,
-                  selectedLanguage);
-              context.go('/word_book', extra: {
-                'wordBookListKey': widget.wordBookList.key,
-                'wordBookKey': wordBookKey,
-                'wordBookTitle': titleController.text,
-                'wordBookLanguage': selectedLanguage,
-              });
-            }
-            Navigator.of(context).pop();
-          },
-        );
-      },
-    );
-  }
-
-  void _deleteWordBookListDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('카테고리 삭제',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20.0,
-              )),
-          content: Text(
-            '정말로 삭제하시겠어요? 삭제하면 카테고리 안에 있는 모든 단어장이 삭제돼요.',
-            style: TextStyle(
-              fontSize: 15.0,
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                '취소',
-                style: TextStyle(
-                  color: BODY_TEXT_COLOR,
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text(
-                '삭제',
-                style: TextStyle(
-                  color: Colors.red[600],
-                ),
-              ),
-              onPressed: () {
-                if (widget.isOnlyOneList) {
-                  showCustomToast(context, '카테고리는 적어도 한 개 이상 필요해요.');
-                } else {
-                  ref
-                      .read(wordBookListProvider.notifier)
-                      .removeWordBookList(widget.wordBookList.key);
-                  showCustomToast(context, '삭제를 완료했어요.');
-                }
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: Colors.white,
-      margin: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-      elevation: 0, // 그림자 제거
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide.none, // 테두리 제거
-      ),
-      child: Column(
-        children: [
-          ListTile(
-            contentPadding: EdgeInsets.fromLTRB(16, 0, 8, 0), // 오른쪽 패딩을 줄임
-            tileColor: PRIMARY_SOFT_COLOR, // 베이지 색상
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-                side: BorderSide(
-                  color: BORDER_COLOR,
-                  width: 1,
-                )),
-
-            leading: widget.isSystemWordBookListCard
-                ? Icon(CupertinoIcons.doc_text_search, color: BUTTON_TEXT_COLOR)
-                : Icon(CupertinoIcons.book, color: BUTTON_TEXT_COLOR),
-            title: Text(
-              widget.wordBookList.title,
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            trailing: !widget.isSystemWordBookListCard
-                ? PopupMenuButton<String>(
-                    icon: Icon(Icons.more_vert, color: BODY_TEXT_COLOR),
-                    onSelected: (String result) {
-                      switch (result) {
-                        case 'add':
-                          _showCreateWordBookModal(context: context);
-                          break;
-                        case 'edit':
-                          _showCreateWordBookModal(
-                              context: context,
-                              originTitle: widget.wordBookList.title);
-                          break;
-                        case 'delete':
-                          _deleteWordBookListDialog();
-                          break;
-                        default:
-                      }
-                    },
-                    color: Colors.white,
-                    itemBuilder: (BuildContext context) =>
-                        <PopupMenuEntry<String>>[
-                      PopupMenuItem<String>(
-                        value: 'add',
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.add,
-                              color: BODY_TEXT_COLOR,
-                            ),
-                            SizedBox(width: 8),
-                            Text('단어장 추가'),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem<String>(
-                        value: 'edit',
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.edit,
-                              color: BODY_TEXT_COLOR,
-                            ),
-                            SizedBox(width: 8),
-                            Text('타이틀 변경'),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem<String>(
-                        value: 'delete',
-                        child: Row(
-                          children: [
-                            Icon(Icons.delete, color: Colors.red[300]),
-                            SizedBox(width: 8),
-                            Text('단어장 삭제',
-                                style: TextStyle(color: Colors.red[300])),
-                          ],
-                        ),
-                      ),
-                    ],
-                  )
-                : null,
-            onTap: () {
-              setState(() {
-                _isExpanded = !_isExpanded;
-              });
-            },
-          ),
-          if (widget.wordBookList.bookList.isEmpty)
-            GestureDetector(
-              onTap: () {
-                _showCreateWordBookModal(context: context);
-              },
-              child: Container(
-                padding: EdgeInsets.all(16),
-                child: Text(
-                  '아직 단어장이 없어요 🥺',
-                  style: TextStyle(
-                    color: BODY_TEXT_COLOR,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-            ),
-          AnimatedCrossFade(
-            firstChild: Container(height: 0),
-            secondChild: _buildExpandedList(),
-            crossFadeState: _isExpanded
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
-            duration: Duration(milliseconds: 150),
-          ),
-        ],
-      ),
-    );
-  }
-
-// COMP: 단어장 목록
-  Widget _buildExpandedList() {
-    return Column(
-      children: widget.wordBookList.bookList.asMap().entries.map((entry) {
-        final int index = entry.key;
-        final WordBookModel book = entry.value;
-        final bool isLastItem =
-            index == widget.wordBookList.bookList.length - 1;
-
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border(
-              bottom: isLastItem
-                  ? BorderSide.none
-                  : BorderSide(
-                      color: Colors.grey[300]!,
-                      width: 1.0,
-                    ),
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.only(left: 6.0),
-            child: ListTile(
-              title: Text(
-                book.title,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
-              leading: Row(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(
-                    CupertinoIcons.right_chevron,
-                    size: 20,
-                    color: BODY_TEXT_COLOR,
-                  ),
-                  if (book.language != 'global')
-                    SizedBox(
-                      width: 20,
-                    ),
-                  if (book.language != 'global')
-                    CountryImage(
-                      language: book.language,
-                    )
-                ],
-              ),
-              onTap: () {
-                context.go('/word_book', extra: {
-                  'wordBookListKey': widget.wordBookList.key,
-                  'wordBookKey': book.key,
-                  'wordBookTitle': book.title,
-                  'wordBookLanguage': book.language,
-                });
-              },
-            ),
-          ),
-        );
-      }).toList(),
     );
   }
 }

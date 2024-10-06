@@ -6,7 +6,10 @@ import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:perfect_memo/common/constant/color.dart';
 import 'package:perfect_memo/common/model/word_card_model.dart';
+import 'package:perfect_memo/common/provider/target_word_book_provider.dart';
 import 'package:perfect_memo/common/provider/word_card_list_provider.dart';
+import 'package:perfect_memo/common/provider/word_filter_provider.dart';
+import 'package:perfect_memo/common/theme/custom_colors.dart';
 import 'package:perfect_memo/common/utils/utils.dart';
 
 class WordSliderCard extends ConsumerStatefulWidget {
@@ -63,6 +66,10 @@ class _WordSliderCardState extends ConsumerState<WordSliderCard>
   }
 
   Widget _buildCard(WordCardModel card, int index) {
+    final CustomColors? theme = Theme.of(context).extension<CustomColors>();
+
+    final fontSize = ref.watch(wordFilterProvider).fontSize;
+
     return GestureDetector(
       onTap: () {
         if (isPlaying) _toggleAutoPlay(forceStop: true);
@@ -73,8 +80,7 @@ class _WordSliderCardState extends ConsumerState<WordSliderCard>
       child: Card(
         borderOnForeground: true,
         elevation: 8,
-        color: PRIMARY_SOFT_COLOR,
-        shadowColor: PRIMARY_COLOR,
+        shadowColor: theme?.buttonBackground,
         child: Center(
           child: revealedStates[index] ?? false
               ? Column(
@@ -82,8 +88,9 @@ class _WordSliderCardState extends ConsumerState<WordSliderCard>
                   children: [
                     Text(
                       card.word,
-                      style:
-                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: fontSize['word']! + 3,
+                          fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center,
                     ),
                     if (card.pronounce.isNotEmpty)
@@ -92,8 +99,9 @@ class _WordSliderCardState extends ConsumerState<WordSliderCard>
                           SizedBox(height: 2),
                           Text(
                             '[${card.pronounce}]',
-                            style:
-                                TextStyle(fontSize: 18, color: BODY_TEXT_COLOR),
+                            style: TextStyle(
+                                fontSize: fontSize['pronounce']! + 4,
+                                color: BODY_TEXT_COLOR),
                             textAlign: TextAlign.center,
                           )
                         ],
@@ -101,15 +109,18 @@ class _WordSliderCardState extends ConsumerState<WordSliderCard>
                     SizedBox(height: 16),
                     Text(
                       card.meaning,
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                          fontSize: fontSize['meaning']! + 2,
+                          fontWeight: FontWeight.w500),
                       textAlign: TextAlign.center,
                     ),
                   ],
                 )
               : Text(
                   widget.isMaskingWord ? card.meaning : card.word,
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: fontSize['word']! + 3,
+                      fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
         ),
@@ -201,14 +212,15 @@ class _WordSliderCardState extends ConsumerState<WordSliderCard>
                 color: isPlaying ? Colors.redAccent : BODY_TEXT_COLOR,
               ),
               IconButton(
-                icon: getCardFormatIcon(widget.cards[curIndex].format),
-                onPressed: () {
+                icon: getCardFormatIcon(format: widget.cards[curIndex].format),
+                onPressed: () async {
                   final newFormat =
                       getCardNextFormat(widget.cards[curIndex].format);
-                  ref
+                  await ref
                       .read(wordCardListProvider(widget.wordBookKey).notifier)
                       .updateCard(widget.cards[curIndex].key,
                           format: newFormat);
+                  await ref.read(targetWordBookProvider.notifier).updateCount();
                 },
               ),
               IconButton(

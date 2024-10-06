@@ -10,17 +10,9 @@ import 'package:perfect_memo/word/view/word_list_content.dart';
 class WordList extends ConsumerStatefulWidget {
   const WordList({
     Key? key,
-    required this.wordBookKey,
-    required this.wordBookListKey,
-    required this.wordBookLanguage,
-    required this.wordBookTitle,
     required this.cards,
   }) : super(key: key);
 
-  final String wordBookKey;
-  final String wordBookLanguage;
-  final String wordBookListKey;
-  final String wordBookTitle;
   final List<WordCardModel> cards;
 
   @override
@@ -67,10 +59,6 @@ class _WordListState extends ConsumerState<WordList> {
                             ),
                             CardIcons(
                               card: card,
-                              wordBookKey: widget.wordBookKey,
-                              wordBookListKey: widget.wordBookListKey,
-                              wordBookTitle: widget.wordBookTitle,
-                              wordBookLanguage: widget.wordBookLanguage,
                             ),
                           ],
                         ),

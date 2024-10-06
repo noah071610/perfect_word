@@ -21,7 +21,7 @@ class WordBookModelAdapter extends TypeAdapter<WordBookModel> {
       title: fields[1] as String,
       createdAt: fields[2] as DateTime,
       wordCount: fields[3] as int,
-      checkedWordCount: fields[4] as int,
+      memorizedWordCount: fields[4] as int,
       difficultyWordCount: fields[5] as int,
       language: fields[6] as String,
     );
@@ -40,7 +40,7 @@ class WordBookModelAdapter extends TypeAdapter<WordBookModel> {
       ..writeByte(3)
       ..write(obj.wordCount)
       ..writeByte(4)
-      ..write(obj.checkedWordCount)
+      ..write(obj.memorizedWordCount)
       ..writeByte(5)
       ..write(obj.difficultyWordCount)
       ..writeByte(6)
@@ -68,7 +68,7 @@ WordBookModel _$WordBookModelFromJson(Map<String, dynamic> json) =>
       title: json['title'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       wordCount: (json['wordCount'] as num).toInt(),
-      checkedWordCount: (json['checkedWordCount'] as num).toInt(),
+      memorizedWordCount: (json['memorizedWordCount'] as num).toInt(),
       difficultyWordCount: (json['difficultyWordCount'] as num).toInt(),
       language: json['language'] as String,
     );
@@ -79,7 +79,7 @@ Map<String, dynamic> _$WordBookModelToJson(WordBookModel instance) =>
       'title': instance.title,
       'createdAt': instance.createdAt.toIso8601String(),
       'wordCount': instance.wordCount,
-      'checkedWordCount': instance.checkedWordCount,
+      'memorizedWordCount': instance.memorizedWordCount,
       'difficultyWordCount': instance.difficultyWordCount,
       'language': instance.language,
     };

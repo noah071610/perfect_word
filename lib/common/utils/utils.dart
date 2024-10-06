@@ -11,19 +11,19 @@ String generateRandomKey() {
       12, (_) => chars.codeUnitAt(random.nextInt(chars.length))));
 }
 
-Icon getCardFormatIcon(CardFormat format) {
+Icon getCardFormatIcon({required CardFormat format, double? size}) {
   switch (format) {
     case CardFormat.unchecked:
-      return Icon(Icons.sentiment_neutral, color: Colors.grey);
+      return Icon(Icons.sentiment_neutral, color: Colors.grey, size: size);
     case CardFormat.memorized:
       return Icon(CupertinoIcons.checkmark_seal_fill,
-          color: CupertinoColors.activeGreen);
+          color: CupertinoColors.activeGreen, size: size);
     case CardFormat.difficulty:
       return Icon(CupertinoIcons.exclamationmark_shield_fill,
-          color: const Color.fromARGB(255, 255, 96, 88));
+          color: const Color.fromARGB(255, 255, 96, 88), size: size);
     default:
       return Icon(CupertinoIcons.question_circle,
-          color: CupertinoColors.systemGrey);
+          color: CupertinoColors.systemGrey, size: size);
   }
 }
 

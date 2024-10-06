@@ -39,4 +39,9 @@ class wordFilterNotifier extends StateNotifier<WordFilterModel> {
     final loadedList = await updateSortTypeSettingInHive(_ref, value);
     state = loadedList;
   }
+
+  Future<void> updateFontSizeSetting(double value) async {
+    final loadedList = await updateFontSizeSettingInHive(_ref, value);
+    state = loadedList;
+  }
 }

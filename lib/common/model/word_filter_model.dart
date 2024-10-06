@@ -52,10 +52,20 @@ class WordFilterModel {
   @HiveField(2)
   final CardSortType sortType;
 
+  @JsonKey()
+  @HiveField(3)
+  final Map<String, double> fontSize;
+
   WordFilterModel({
     required this.maskingType,
     required this.layoutType,
     required this.sortType,
+    this.fontSize = const {
+      'word': 22,
+      'pronounce': 14,
+      'meaning': 16,
+      'value': 3,
+    },
   });
 
   factory WordFilterModel.fromJson(Map<String, dynamic> json) =>
@@ -67,11 +77,13 @@ class WordFilterModel {
     CardMaskingType? maskingType,
     CardLayoutType? layoutType,
     CardSortType? sortType,
+    Map<String, double>? fontSize,
   }) {
     return WordFilterModel(
       maskingType: maskingType ?? this.maskingType,
       layoutType: layoutType ?? this.layoutType,
       sortType: sortType ?? this.sortType,
+      fontSize: fontSize ?? this.fontSize,
     );
   }
 }

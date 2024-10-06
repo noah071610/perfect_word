@@ -40,3 +40,11 @@ Future<void> removeWordCardFromHive(
 
   await box.put(key, wordCardList);
 }
+
+Future<void> removeWordBookFromHive(
+    Ref<Object?> ref, String wordBookKey) async {
+  final key = 'word_card_list_$wordBookKey';
+  final box = await ref.read(boxProvider(key).future);
+
+  await box.delete(key);
+}

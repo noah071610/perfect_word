@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:perfect_memo/common/constant/color.dart';
 
 class FloatingLabelTextField extends StatefulWidget {
   final String label;
@@ -56,6 +55,8 @@ class _FloatingLabelTextFieldState extends State<FloatingLabelTextField> {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
     return TextFormField(
       controller: widget.controller,
       focusNode: _focusNode,
@@ -66,26 +67,27 @@ class _FloatingLabelTextFieldState extends State<FloatingLabelTextField> {
         labelText: widget.label,
         hintText: widget.hintText,
         border: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey.shade400),
+          borderSide: BorderSide(color: theme.colorScheme.outline, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(
             color: (widget.controller.text.isNotEmpty || _focusNode.hasFocus)
-                ? BUTTON_TEXT_COLOR
-                : Colors.grey.shade400,
+                ? theme.colorScheme.primary
+                : theme.colorScheme.outline,
+            width: 1,
           ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: BUTTON_TEXT_COLOR, width: 1),
+          borderSide: BorderSide(color: theme.colorScheme.primary, width: 1),
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         floatingLabelBehavior: FloatingLabelBehavior.always,
         labelStyle: TextStyle(
           fontSize: 20.0,
           color: (widget.controller.text != '' || _focusNode.hasFocus)
-              ? BUTTON_TEXT_COLOR
-              : Colors.grey.shade800,
-          fontWeight: FontWeight.w500,
+              ? theme.colorScheme.primary
+              : theme.colorScheme.outline,
+          fontWeight: FontWeight.w400,
         ),
       ),
     );

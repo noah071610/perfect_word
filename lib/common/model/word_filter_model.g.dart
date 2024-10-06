@@ -20,19 +20,22 @@ class WordFilterModelAdapter extends TypeAdapter<WordFilterModel> {
       maskingType: fields[0] as CardMaskingType,
       layoutType: fields[1] as CardLayoutType,
       sortType: fields[2] as CardSortType,
+      fontSize: (fields[3] as Map).cast<String, double>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, WordFilterModel obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.maskingType)
       ..writeByte(1)
       ..write(obj.layoutType)
       ..writeByte(2)
-      ..write(obj.sortType);
+      ..write(obj.sortType)
+      ..writeByte(3)
+      ..write(obj.fontSize);
   }
 
   @override
@@ -197,6 +200,10 @@ WordFilterModel _$WordFilterModelFromJson(Map<String, dynamic> json) =>
       maskingType: $enumDecode(_$CardMaskingTypeEnumMap, json['maskingType']),
       layoutType: $enumDecode(_$CardLayoutTypeEnumMap, json['layoutType']),
       sortType: $enumDecode(_$CardSortTypeEnumMap, json['sortType']),
+      fontSize: (json['fontSize'] as Map<String, dynamic>?)?.map(
+            (k, e) => MapEntry(k, (e as num).toDouble()),
+          ) ??
+          const {'word': 22, 'pronounce': 14, 'meaning': 16},
     );
 
 Map<String, dynamic> _$WordFilterModelToJson(WordFilterModel instance) =>
@@ -204,6 +211,7 @@ Map<String, dynamic> _$WordFilterModelToJson(WordFilterModel instance) =>
       'maskingType': _$CardMaskingTypeEnumMap[instance.maskingType]!,
       'layoutType': _$CardLayoutTypeEnumMap[instance.layoutType]!,
       'sortType': _$CardSortTypeEnumMap[instance.sortType]!,
+      'fontSize': instance.fontSize,
     };
 
 const _$CardMaskingTypeEnumMap = {

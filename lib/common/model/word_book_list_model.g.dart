@@ -19,7 +19,7 @@ class WordBookListModelAdapter extends TypeAdapter<WordBookListModel> {
     return WordBookListModel(
       key: fields[0] as String,
       title: fields[1] as String,
-      bookList: (fields[2] as List).cast<WordBookModel>(),
+      wordBookList: (fields[2] as List).cast<WordBookModel>(),
     );
   }
 
@@ -32,7 +32,7 @@ class WordBookListModelAdapter extends TypeAdapter<WordBookListModel> {
       ..writeByte(1)
       ..write(obj.title)
       ..writeByte(2)
-      ..write(obj.bookList);
+      ..write(obj.wordBookList);
   }
 
   @override
@@ -54,7 +54,7 @@ WordBookListModel _$WordBookListModelFromJson(Map<String, dynamic> json) =>
     WordBookListModel(
       key: json['key'] as String,
       title: json['title'] as String,
-      bookList: (json['bookList'] as List<dynamic>)
+      wordBookList: (json['wordBookList'] as List<dynamic>)
           .map((e) => WordBookModel.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -63,5 +63,5 @@ Map<String, dynamic> _$WordBookListModelToJson(WordBookListModel instance) =>
     <String, dynamic>{
       'key': instance.key,
       'title': instance.title,
-      'bookList': instance.bookList,
+      'wordBookList': instance.wordBookList,
     };

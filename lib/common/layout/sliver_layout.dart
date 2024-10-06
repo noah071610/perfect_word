@@ -35,15 +35,18 @@ class SliverLayout extends ConsumerWidget {
         onTap: onClickTitle,
         child: Text(
           title!,
-          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
+          style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
         ),
       ),
       elevation: 0,
+      pinned: false,
+      floating: true,
+      snap: true,
       actions: [
         if (actions != null) ...actions!,
       ],
-      centerTitle: false,
       bottom: bottom,
+      centerTitle: false,
     );
   }
 }

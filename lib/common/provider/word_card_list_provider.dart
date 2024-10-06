@@ -134,23 +134,14 @@ class wordCardListNotifier extends StateNotifier<List<WordCardModel>> {
     state = state.map((card) {
       if (card.key == key) {
         return card.copyWith(
-          word: word,
-          meaning: meaning,
-          pronounce: pronounce,
-          format: format,
+          word: word ?? card.word,
+          meaning: meaning ?? card.meaning,
+          pronounce: pronounce ?? card.pronounce,
+          format: format ?? card.format,
         );
       }
       return card;
     }).toList();
-    updateWordCardListInHive(_ref, wordBookKey, state);
-  }
-
-  void reorderCards(int oldIndex, int newIndex) {
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
-    }
-    final WordCardModel item = state.removeAt(oldIndex);
-    state = [...state]..insert(newIndex, item);
     updateWordCardListInHive(_ref, wordBookKey, state);
   }
 

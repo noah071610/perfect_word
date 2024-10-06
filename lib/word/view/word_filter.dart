@@ -2,8 +2,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:perfect_memo/common/constant/color.dart';
+import 'package:perfect_memo/common/constant/toast.dart';
+import 'package:perfect_memo/common/provider/target_word_book_provider.dart';
+
+import 'package:go_router/go_router.dart';
 import 'package:perfect_memo/common/provider/word_filter_provider.dart';
 import 'package:perfect_memo/common/model/word_filter_model.dart';
+import 'package:perfect_memo/common/widgets/confirm_dialog.dart';
+import 'package:perfect_memo/common/widgets/custom_button.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:perfect_memo/common/widgets/font_size_slider.dart';
 
 // COMP: filter sheet
 class FilterSheet extends ConsumerWidget {
@@ -38,12 +46,12 @@ class FilterSheet extends ConsumerWidget {
                   ),
                 ),
                 _buildFilterSection(
-                  title: '마스킹',
+                  title: context.tr('masking'),
                   icon: CupertinoIcons.eye_slash,
                   child: Column(
                     children: [
                       _buildRadioButton<CardMaskingType>(
-                        '마스킹 없음',
+                        context.tr('no_masking'),
                         wordFilter.maskingType,
                         CardMaskingType.none,
                         (value) => ref
@@ -51,7 +59,7 @@ class FilterSheet extends ConsumerWidget {
                             .updateMaskSetting(CardMaskingType.none),
                       ),
                       _buildRadioButton<CardMaskingType>(
-                        '단어 가리기',
+                        context.tr('hide_word'),
                         wordFilter.maskingType,
                         CardMaskingType.word,
                         (value) => ref
@@ -59,7 +67,7 @@ class FilterSheet extends ConsumerWidget {
                             .updateMaskSetting(CardMaskingType.word),
                       ),
                       _buildRadioButton<CardMaskingType>(
-                        '뜻 가리기',
+                        context.tr('hide_meaning'),
                         wordFilter.maskingType,
                         CardMaskingType.meaning,
                         (value) => ref
@@ -70,26 +78,26 @@ class FilterSheet extends ConsumerWidget {
                   ),
                 ),
                 _buildFilterSection(
-                  title: '배치 타입',
+                  title: context.tr('layout_type'),
                   icon: CupertinoIcons.square_grid_2x2,
                   child: Column(
                     children: [
                       _buildRadioButton<CardLayoutType>(
-                          '리스트 카드',
+                          context.tr('list_card'),
                           wordFilter.layoutType,
                           CardLayoutType.list,
                           (value) => ref
                               .read(wordFilterProvider.notifier)
                               .updateLayoutTypeSetting(CardLayoutType.list)),
                       _buildRadioButton<CardLayoutType>(
-                          '슬라이드',
+                          context.tr('slide'),
                           wordFilter.layoutType,
                           CardLayoutType.slide,
                           (value) => ref
                               .read(wordFilterProvider.notifier)
                               .updateLayoutTypeSetting(CardLayoutType.slide)),
                       _buildRadioButton<CardLayoutType>(
-                          '단어장',
+                          context.tr('word_book'),
                           wordFilter.layoutType,
                           CardLayoutType.grid,
                           (value) => ref
@@ -100,26 +108,26 @@ class FilterSheet extends ConsumerWidget {
                 ),
                 _buildFilterSection(
                   isLast: true,
-                  title: '정렬',
+                  title: context.tr('sort'),
                   icon: CupertinoIcons.sort_down,
                   child: Column(
                     children: [
                       _buildRadioButton(
-                          '입력 순',
+                          context.tr('input_order'),
                           wordFilter.sortType.toString(),
                           CardSortType.createdAt.toString(),
                           (value) => ref
                               .read(wordFilterProvider.notifier)
                               .updateSortTypeSetting(CardSortType.createdAt)),
                       _buildRadioButton(
-                          '오래된 순',
+                          context.tr('oldest_first'),
                           wordFilter.sortType.toString(),
                           CardSortType.oldestFirst.toString(),
                           (value) => ref
                               .read(wordFilterProvider.notifier)
                               .updateSortTypeSetting(CardSortType.oldestFirst)),
                       _buildRadioButton(
-                          '사전순',
+                          context.tr('alphabetical_order'),
                           wordFilter.sortType.toString(),
                           CardSortType.alphabetical.toString(),
                           (value) => ref
@@ -127,14 +135,14 @@ class FilterSheet extends ConsumerWidget {
                               .updateSortTypeSetting(
                                   CardSortType.alphabetical)),
                       _buildRadioButton(
-                          '어려운 순',
+                          context.tr('difficulty_order'),
                           wordFilter.sortType.toString(),
                           CardSortType.difficulty.toString(),
                           (value) => ref
                               .read(wordFilterProvider.notifier)
                               .updateSortTypeSetting(CardSortType.difficulty)),
                       _buildRadioButton(
-                          '외운 순',
+                          context.tr('memorized_order'),
                           wordFilter.sortType.toString(),
                           CardSortType.memorized.toString(),
                           (value) => ref
@@ -142,6 +150,35 @@ class FilterSheet extends ConsumerWidget {
                               .updateSortTypeSetting(CardSortType.memorized)),
                     ],
                   ),
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+                _buildFilterSection(
+                  title: context.tr('font_size'),
+                  icon: CupertinoIcons.textformat_size,
+                  child: FontSizeSlider(),
+                ),
+                CustomButton(
+                  onSubmit: () {
+                    confirmDialog(
+                      context: context,
+                      onPressed: () async {
+                        await ref
+                            .read(targetWordBookProvider.notifier)
+                            .removeWordBook();
+                        showCustomToast(
+                            context: context,
+                            message: context.tr('delete_completed'));
+                        Navigator.of(context).pop();
+                        context.go('/');
+                      },
+                      title: context.tr('delete_word_book'),
+                      content: context.tr('confirm_delete_word_book'),
+                    );
+                  },
+                  text: context.tr('delete_word_book'),
+                  isWarning: true,
                 ),
               ],
             ),

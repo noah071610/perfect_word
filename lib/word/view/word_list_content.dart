@@ -1,10 +1,13 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:perfect_memo/common/constant/color.dart';
 import 'package:perfect_memo/common/model/word_card_model.dart';
+import 'package:perfect_memo/common/provider/target_word_book_provider.dart';
 import 'package:perfect_memo/common/provider/word_card_list_provider.dart';
+import 'package:perfect_memo/common/provider/word_filter_provider.dart';
 
 import 'package:perfect_memo/common/utils/utils.dart';
 
@@ -27,6 +30,7 @@ class CardMainContent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
+    final fontSize = ref.watch(wordFilterProvider).fontSize;
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque, // TIP: 전체 클릭 가능
@@ -40,27 +44,27 @@ class CardMainContent extends ConsumerWidget {
               hideWord
                   ? HiddenTextWidget(
                       text: card.word,
-                      fontSize: 21,
-                      height: 25,
+                      fontSize: fontSize['word']!,
+                      height: fontSize['word']! + 1 + fontSize['value']!,
                     )
                   : Text(
                       card.word,
                       style: TextStyle(
-                        fontSize: 21,
-                        fontWeight: FontWeight.bold,
+                        fontSize: fontSize['word']!,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
               if (card.pronounce.isNotEmpty)
                 hideWord
                     ? HiddenTextWidget(
                         text: card.pronounce,
-                        fontSize: 14,
-                        height: 15,
+                        fontSize: fontSize['pronounce']!,
+                        height: fontSize['pronounce']! + 1,
                       )
                     : Text(
                         '[${card.pronounce}]',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: fontSize['pronounce']!,
                           color: BODY_TEXT_COLOR,
                         ),
                       ),
@@ -68,13 +72,13 @@ class CardMainContent extends ConsumerWidget {
               hideMeaning
                   ? HiddenTextWidget(
                       text: card.meaning,
-                      fontSize: 16,
-                      height: 18,
+                      fontSize: fontSize['meaning']!,
+                      height: fontSize['meaning']! + 2,
                     )
                   : Text(
                       card.meaning,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: fontSize['meaning']!,
                       ),
                     ),
             ],
@@ -126,33 +130,30 @@ class CardIcons extends ConsumerWidget {
   const CardIcons({
     super.key,
     required this.card,
-    required this.wordBookKey,
-    required this.wordBookListKey,
-    required this.wordBookTitle,
-    required this.wordBookLanguage,
   });
 
   final WordCardModel card;
-  final String wordBookKey;
-  final String wordBookListKey;
-  final String wordBookTitle;
-  final String wordBookLanguage;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final wordBook = ref.watch(targetWordBookProvider);
+    final cardList =
+        ref.read(wordCardListProvider(wordBook.wordBookKey).notifier);
+
+    final fontSize = ref.read(wordFilterProvider).fontSize;
+
     return Positioned(
-      top: 8,
+      top: 5 + fontSize['value']!,
       right: -10,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
-            icon: getCardFormatIcon(card.format),
-            onPressed: () {
+            icon: getCardFormatIcon(format: card.format),
+            onPressed: () async {
               final newFormat = getCardNextFormat(card.format);
-              ref
-                  .read(wordCardListProvider(wordBookKey).notifier)
-                  .updateCard(card.key, format: newFormat);
+              await cardList.updateCard(card.key, format: newFormat);
+              await ref.read(targetWordBookProvider.notifier).updateCount();
             },
           ),
           PopupMenuButton<String>(
@@ -161,24 +162,17 @@ class CardIcons extends ConsumerWidget {
               switch (result) {
                 case 'edit':
                   context.go('/word_book/add', extra: {
-                    'wordBookTitle': wordBookTitle,
-                    'wordBookKey': wordBookKey,
-                    'wordBookListKey': wordBookListKey,
-                    'wordBookLanguage': wordBookLanguage,
                     'targetIndex': 2,
                     'wordKey': card.key,
                   });
                   break;
                 case 'delete':
-                  ref
-                      .read(wordCardListProvider(wordBookKey).notifier)
-                      .removeCard(card.key);
+                  cardList.removeCard(card.key);
                   break;
                 default:
               }
               // 여기에 선택된 메뉴 항목에 대한 동작을 추가하세요
             },
-            color: Colors.white,
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
               PopupMenuItem<String>(
                 value: 'edit',
@@ -189,7 +183,7 @@ class CardIcons extends ConsumerWidget {
                       color: BODY_TEXT_COLOR,
                     ),
                     SizedBox(width: 8),
-                    Text('단어 수정'),
+                    Text(context.tr('edit_word')),
                   ],
                 ),
               ),
@@ -202,7 +196,7 @@ class CardIcons extends ConsumerWidget {
                       color: BODY_TEXT_COLOR,
                     ),
                     SizedBox(width: 8),
-                    Text('단어장 이동'),
+                    Text(context.tr('move_to_word_book')),
                   ],
                 ),
               ),
@@ -212,7 +206,8 @@ class CardIcons extends ConsumerWidget {
                   children: [
                     Icon(Icons.delete, color: Colors.red[300]),
                     SizedBox(width: 8),
-                    Text('단어 삭제', style: TextStyle(color: Colors.red[300])),
+                    Text(context.tr('delete_word'),
+                        style: TextStyle(color: Colors.red[300])),
                   ],
                 ),
               ),

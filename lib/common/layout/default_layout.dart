@@ -3,26 +3,31 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class DefaultLayout extends ConsumerWidget {
   final String? title;
+  final Color? color;
   final Widget child;
   final Widget? bottomNavigationBar;
   final List<Widget>? actions;
   final void Function()? onClickTitle;
+  final bool centerTitle;
 
   const DefaultLayout({
     required this.child,
     this.title,
+    this.color,
     this.bottomNavigationBar,
     this.actions,
     this.onClickTitle = null,
+    this.centerTitle = false,
     super.key,
   });
 
   @override
   Widget build(BuildContext context, ref) {
     return Scaffold(
+      backgroundColor: color ?? null,
       body: SafeArea(
         top: true,
-        bottom: false,
+        bottom: true,
         child: child,
       ),
       appBar: renderAppbar(context),
@@ -38,12 +43,12 @@ class DefaultLayout extends ConsumerWidget {
         onTap: onClickTitle,
         child: Text(
           title!,
-          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
+          style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
         ),
       ),
       elevation: 0,
       actions: actions,
-      centerTitle: false,
+      centerTitle: centerTitle,
     );
   }
 }

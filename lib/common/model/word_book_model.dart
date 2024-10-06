@@ -24,7 +24,7 @@ class WordBookModel {
 
   @JsonKey()
   @HiveField(4)
-  final int checkedWordCount;
+  final int memorizedWordCount;
 
   @JsonKey()
   @HiveField(5)
@@ -39,7 +39,7 @@ class WordBookModel {
     required this.title,
     required this.createdAt,
     required this.wordCount,
-    required this.checkedWordCount,
+    required this.memorizedWordCount,
     required this.difficultyWordCount,
     required this.language,
   });
@@ -55,7 +55,7 @@ class WordBookModel {
     DateTime? createdAt,
     String? category,
     int? wordCount,
-    int? checkedWordCount,
+    int? memorizedWordCount,
     int? difficultyWordCount,
     String? language,
   }) {
@@ -64,7 +64,7 @@ class WordBookModel {
       title: title ?? this.title,
       createdAt: createdAt ?? this.createdAt,
       wordCount: wordCount ?? this.wordCount,
-      checkedWordCount: checkedWordCount ?? this.checkedWordCount,
+      memorizedWordCount: memorizedWordCount ?? this.memorizedWordCount,
       difficultyWordCount: difficultyWordCount ?? this.difficultyWordCount,
       language: language ?? this.language,
     );

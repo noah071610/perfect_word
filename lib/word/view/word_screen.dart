@@ -8,8 +8,8 @@ import 'package:perfect_memo/common/constant/toast.dart';
 import 'package:perfect_memo/common/layout/default_layout.dart';
 import 'package:perfect_memo/common/layout/sliver_layout.dart';
 import 'package:perfect_memo/common/model/word_filter_model.dart';
+import 'package:perfect_memo/common/provider/target_word_book_provider.dart';
 import 'package:perfect_memo/common/provider/word_card_list_provider.dart';
-import 'package:perfect_memo/common/provider/word_book_list_provider.dart';
 import 'package:perfect_memo/common/provider/word_filter_provider.dart';
 import 'package:perfect_memo/common/widgets/custom_dialog.dart';
 import 'package:perfect_memo/common/widgets/floating_label_text_field.dart';
@@ -17,19 +17,11 @@ import 'package:perfect_memo/word/view/word_card.dart';
 import 'package:perfect_memo/word/view/word_grid.dart';
 import 'package:perfect_memo/word/view/word_list.dart';
 import 'package:perfect_memo/word/view/word_filter.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class WordScreen extends ConsumerStatefulWidget {
-  final String wordBookListKey;
-  final String wordBookKey;
-  final String wordBookTitle;
-  final String wordBookLanguage;
-
   const WordScreen({
     super.key,
-    required this.wordBookKey,
-    required this.wordBookListKey,
-    required this.wordBookTitle,
-    required this.wordBookLanguage,
   });
 
   @override
@@ -70,7 +62,7 @@ class _WordScreenState extends ConsumerState<WordScreen> {
   }
 
 // COMP: 앱바 아이콘
-  List<Widget> _buildActions(bool isSystemWordBook) {
+  List<Widget> _buildActions(bool isSystemWordBook, String wordBookKey) {
     return [
       if (!isSystemWordBook)
         IconButton(
@@ -84,7 +76,7 @@ class _WordScreenState extends ConsumerState<WordScreen> {
         ),
       IconButton(
         icon: const Icon(CupertinoIcons.repeat),
-        onPressed: _shuffleCards,
+        onPressed: () => {_shuffleCards(wordBookKey)},
       ),
       IconButton(
         icon: const Icon(CupertinoIcons.sort_down),
@@ -97,18 +89,14 @@ class _WordScreenState extends ConsumerState<WordScreen> {
     context.go(
       '/word_book/add',
       extra: {
-        'wordBookTitle': widget.wordBookTitle,
-        'wordBookKey': widget.wordBookKey,
-        'wordBookListKey': widget.wordBookListKey,
-        'wordBookLanguage': widget.wordBookLanguage,
         'targetIndex': targetIndex,
       },
     );
   }
 
-  void _shuffleCards() {
+  void _shuffleCards(String wordBookKey) {
     final cardListNotifier =
-        ref.read(wordCardListProvider(widget.wordBookKey).notifier);
+        ref.read(wordCardListProvider(wordBookKey).notifier);
     cardListNotifier.shuffleCards();
   }
 
@@ -132,25 +120,26 @@ class _WordScreenState extends ConsumerState<WordScreen> {
       context: context,
       builder: (context) {
         return CustomDialog(
-          title: '💬 타이틀 변경',
-          btnText: '타이틀 변경하기',
+          title: context.tr('change_title_dialog'),
+          btnText: context.tr('edit'),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               SizedBox(height: 8.0),
               FloatingLabelTextField(
-                label: '타이틀명',
+                label: context.tr('title_name'),
                 controller: titleController,
               ),
               SizedBox(height: 20.0),
             ],
           ),
           onTap: () {
-            ref.read(wordBookListProvider.notifier).changeWordBookTitle(
-                widget.wordBookListKey,
-                widget.wordBookKey,
-                titleController.text);
-            showCustomToast(context, '타이틀이 변경되었어요!');
+            ref
+                .read(targetWordBookProvider.notifier)
+                .updateWordBookTitle(titleController.text);
+
+            showCustomToast(
+                context: context, message: context.tr('title_changed_message'));
             Navigator.pop(context);
           },
         );
@@ -160,18 +149,19 @@ class _WordScreenState extends ConsumerState<WordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final cards = ref.watch(filteredWordCardListProvider(widget.wordBookKey));
+    final wordBook = ref.watch(targetWordBookProvider);
+    final cards = ref.watch(filteredWordCardListProvider(wordBook.wordBookKey));
     final filter = ref.watch(wordFilterProvider);
 
-    final bool isSystemWordBook =
-        widget.wordBookKey == 'difficulty' || widget.wordBookKey == 'checked';
+    final bool isSystemWordBook = wordBook.wordBookKey == 'difficulty' ||
+        wordBook.wordBookKey == 'deleted';
 
     return filter.layoutType == CardLayoutType.list
         ? SliverLayout(
-            title: widget.wordBookTitle,
+            title: wordBook.wordBookTitle,
             onClickTitle: () => {
               if (!isSystemWordBook)
-                _showTitleChangeDialog(context, ref, widget.wordBookTitle)
+                _showTitleChangeDialog(context, ref, wordBook.wordBookTitle)
             },
             bottom: PreferredSize(
               preferredSize: Size.fromHeight(45.0),
@@ -197,8 +187,12 @@ class _WordScreenState extends ConsumerState<WordScreen> {
                             child: TextField(
                               controller: searchController,
                               decoration: InputDecoration(
-                                hintText: '검색어를 입력하세요',
+                                hintText: context.tr('search_hint'),
                                 border: InputBorder.none,
+                              ),
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16.0,
                               ),
                             ),
                           ),
@@ -230,37 +224,33 @@ class _WordScreenState extends ConsumerState<WordScreen> {
             ),
             slivers: [
               WordList(
-                wordBookKey: widget.wordBookKey,
-                wordBookListKey: widget.wordBookListKey,
-                wordBookTitle: widget.wordBookTitle,
-                wordBookLanguage: widget.wordBookLanguage,
                 cards: cards,
               ),
             ],
-            actions: _buildActions(isSystemWordBook),
+            actions: _buildActions(isSystemWordBook, wordBook.wordBookKey),
           )
         : DefaultLayout(
-            title: widget.wordBookTitle,
+            title: wordBook.wordBookTitle,
             onClickTitle: () => {
               if (!isSystemWordBook)
-                _showTitleChangeDialog(context, ref, widget.wordBookTitle)
+                _showTitleChangeDialog(context, ref, wordBook.wordBookTitle)
             },
-            actions: _buildActions(isSystemWordBook),
+            actions: _buildActions(isSystemWordBook, wordBook.wordBookKey),
             child: filter.layoutType == CardLayoutType.grid
                 ? WordGrid(
                     cards: cards,
-                    wordBookKey: widget.wordBookKey,
+                    wordBookKey: wordBook.wordBookKey,
                     isMaskingWord: filter.maskingType == CardMaskingType.word,
                   )
                 : cards.isNotEmpty
                     ? WordSliderCard(
                         cards: cards,
-                        wordBookKey: widget.wordBookKey,
+                        wordBookKey: wordBook.wordBookKey,
                         isMaskingWord:
                             filter.maskingType == CardMaskingType.word,
                       )
                     : Center(
-                        child: Text('단어가 없습니다'),
+                        child: Text(context.tr('no_words')),
                       ),
           );
   }

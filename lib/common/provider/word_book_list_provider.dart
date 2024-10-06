@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:perfect_memo/common/hive/hive.dart';
+import 'package:perfect_memo/common/hive/word_card_list_hive.dart';
 import 'package:perfect_memo/common/hive/word_list_hive.dart';
 import 'package:perfect_memo/common/model/word_book_list_model.dart';
 import 'package:perfect_memo/common/model/word_book_model.dart';
@@ -25,13 +25,13 @@ class wordBookListNotifier extends StateNotifier<List<WordBookListModel>> {
       String languageValue) async {
     final newWordBookList = state
         .map((e) => e.key == listKey
-            ? e.copyWith(bookList: [
-                ...e.bookList,
+            ? e.copyWith(wordBookList: [
+                ...e.wordBookList,
                 WordBookModel(
                   key: bookKey,
                   title: title,
                   createdAt: DateTime.now(),
-                  checkedWordCount: 0,
+                  memorizedWordCount: 0,
                   wordCount: 0,
                   difficultyWordCount: 0,
                   language: languageValue,
@@ -47,18 +47,19 @@ class wordBookListNotifier extends StateNotifier<List<WordBookListModel>> {
     final newWordBookList = WordBookListModel(
       key: listKey,
       title: title,
-      bookList: [],
+      wordBookList: [],
     );
     state = [newWordBookList, ...state];
     await updateWordBookListInHive(_ref, state);
   }
 
-  WordBookListModel findOne(String key) {
-    return state.firstWhere((e) => e.key == key);
-  }
-
-  Future<void> removeWordBookList(String wordBookListKey) async {
+  Future<void> removeWordBookList(
+      String wordBookListKey, List<String> wordBookKeyArr) async {
     state = state.where((word) => !wordBookListKey.contains(word.key)).toList();
+    wordBookKeyArr.forEach((key) async {
+      await removeWordBookFromHive(_ref, key);
+    });
+
     await updateWordBookListInHive(_ref, state);
   }
 
@@ -67,7 +68,7 @@ class wordBookListNotifier extends StateNotifier<List<WordBookListModel>> {
     state = state.map((wordBookList) {
       if (wordBookList.key == wordBookListKey) {
         return wordBookList.copyWith(
-          bookList: wordBookList.bookList.map((wordBook) {
+          wordBookList: wordBookList.wordBookList.map((wordBook) {
             if (wordBook.key == wordBookKey) {
               return wordBook.copyWith(title: newTitle);
             }
@@ -86,6 +87,13 @@ class wordBookListNotifier extends StateNotifier<List<WordBookListModel>> {
         .map((book) =>
             book.key == wordBookListKey ? book.copyWith(title: newTitle) : book)
         .toList();
+    await updateWordBookListInHive(_ref, state);
+  }
+
+  Future<void> update(
+    List<WordBookListModel> updatedWordBookList,
+  ) async {
+    state = updatedWordBookList;
     await updateWordBookListInHive(_ref, state);
   }
 }
