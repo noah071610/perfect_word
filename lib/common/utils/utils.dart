@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:perfect_memo/common/model/word_card_model.dart';
+import 'package:perfect_wordbook/common/model/word_card_model.dart';
 import 'dart:ui' as ui;
 
 String generateRandomKey() {

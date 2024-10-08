@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:perfect_memo/common/constant/color.dart';
-import 'package:perfect_memo/common/theme/custom_colors.dart';
-import 'package:perfect_memo/common/widgets/country_image.dart';
+import 'package:perfect_wordbook/common/constant/color.dart';
+import 'package:perfect_wordbook/common/theme/custom_colors.dart';
+import 'package:perfect_wordbook/common/widgets/country_image.dart';
 
 enum SettingType {
   toggle,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:perfect_memo/common/constant/color.dart';
+import 'package:perfect_wordbook/common/constant/color.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 void confirmDialog({

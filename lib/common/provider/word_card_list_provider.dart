@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:perfect_memo/common/hive/word_card_list_hive.dart';
-import 'package:perfect_memo/common/model/word_card_model.dart';
-import 'package:perfect_memo/common/model/word_filter_model.dart';
-import 'package:perfect_memo/common/provider/word_filter_provider.dart';
-import 'package:perfect_memo/common/utils/utils.dart';
+import 'package:perfect_wordbook/common/hive/word_card_list_hive.dart';
+import 'package:perfect_wordbook/common/model/word_card_model.dart';
+import 'package:perfect_wordbook/common/model/word_filter_model.dart';
+import 'package:perfect_wordbook/common/provider/word_filter_provider.dart';
+import 'package:perfect_wordbook/common/utils/utils.dart';
 
 // 필터링된 단어 카드 목록을 제공하는 프로바이더
 final searchQueryProvider = StateProvider<String>((ref) => '');

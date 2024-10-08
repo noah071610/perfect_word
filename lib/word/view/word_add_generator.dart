@@ -2,11 +2,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:perfect_memo/common/constant/color.dart';
-import 'package:perfect_memo/common/constant/toast.dart';
-import 'package:perfect_memo/common/model/word_card_model.dart';
-import 'package:perfect_memo/common/widgets/country_image.dart';
-import 'package:perfect_memo/common/widgets/custom_button.dart';
+import 'package:perfect_wordbook/common/constant/color.dart';
+import 'package:perfect_wordbook/common/constant/toast.dart';
+import 'package:perfect_wordbook/common/model/word_card_model.dart';
+import 'package:perfect_wordbook/common/widgets/country_image.dart';
+import 'package:perfect_wordbook/common/widgets/custom_button.dart';
 
 class AIWordForm extends ConsumerStatefulWidget {
   final String title;

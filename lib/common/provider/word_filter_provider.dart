@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:perfect_memo/common/hive/word_filter_hive.dart';
-import 'package:perfect_memo/common/model/word_filter_model.dart';
+import 'package:perfect_wordbook/common/hive/word_filter_hive.dart';
+import 'package:perfect_wordbook/common/model/word_filter_model.dart';
 
 final wordFilterProvider =
     StateNotifierProvider<wordFilterNotifier, WordFilterModel>((ref) {

@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:perfect_memo/common/constant/toast.dart';
+import 'package:perfect_wordbook/common/constant/toast.dart';
 import 'package:go_router/go_router.dart';
-import 'package:perfect_memo/common/model/word_card_model.dart';
-import 'package:perfect_memo/common/provider/target_word_book_provider.dart';
-import 'package:perfect_memo/common/provider/word_book_list_provider.dart';
+import 'package:perfect_wordbook/common/model/word_card_model.dart';
+import 'package:perfect_wordbook/common/provider/target_word_book_provider.dart';
+import 'package:perfect_wordbook/common/provider/word_book_list_provider.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:perfect_memo/common/model/word_book_list_model.dart';
-import 'package:perfect_memo/common/model/word_book_model.dart';
-import 'package:perfect_memo/common/utils/utils.dart';
-import 'package:perfect_memo/common/widgets/confirm_dialog.dart';
-import 'package:perfect_memo/common/widgets/country_image.dart';
-import 'package:perfect_memo/common/widgets/custom_dialog.dart';
-import 'package:perfect_memo/common/widgets/floating_label_text_field.dart';
-import 'package:perfect_memo/common/constant/data.dart';
+import 'package:perfect_wordbook/common/model/word_book_list_model.dart';
+import 'package:perfect_wordbook/common/model/word_book_model.dart';
+import 'package:perfect_wordbook/common/utils/utils.dart';
+import 'package:perfect_wordbook/common/widgets/confirm_dialog.dart';
+import 'package:perfect_wordbook/common/widgets/country_image.dart';
+import 'package:perfect_wordbook/common/widgets/custom_dialog.dart';
+import 'package:perfect_wordbook/common/widgets/floating_label_text_field.dart';
+import 'package:perfect_wordbook/common/constant/data.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 /// COMP: 리스트 카드
@@ -36,7 +36,7 @@ class WordBookListCard extends ConsumerStatefulWidget {
 class _WordBookListCardState extends ConsumerState<WordBookListCard> {
   bool _isExpanded = true;
   final TextEditingController titleController = TextEditingController();
-  String selectedLanguage = 'GB'; // 기본값으로 영국 국기 설정
+  String selectedLanguage = 'US'; // 기본값으로 영국 국기 설정
 
   /// COMP: 모달
   void _showCreateWordBookModal({

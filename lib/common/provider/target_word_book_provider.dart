@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:perfect_memo/common/hive/word_card_list_hive.dart';
-import 'package:perfect_memo/common/model/target_word_book_model.dart';
-import 'package:perfect_memo/common/model/word_book_list_model.dart';
-import 'package:perfect_memo/common/model/word_card_model.dart';
-import 'package:perfect_memo/common/provider/word_book_list_provider.dart';
-import 'package:perfect_memo/common/provider/word_card_list_provider.dart';
+import 'package:perfect_wordbook/common/hive/word_card_list_hive.dart';
+import 'package:perfect_wordbook/common/model/target_word_book_model.dart';
+import 'package:perfect_wordbook/common/model/word_book_list_model.dart';
+import 'package:perfect_wordbook/common/model/word_card_model.dart';
+import 'package:perfect_wordbook/common/provider/word_book_list_provider.dart';
+import 'package:perfect_wordbook/common/provider/word_card_list_provider.dart';
 
 final targetWordBookProvider =
     StateNotifierProvider<TargetWordBookNotifier, TargetWordBookModel>((ref) {

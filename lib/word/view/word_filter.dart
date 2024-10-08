@@ -1,17 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:perfect_memo/common/constant/color.dart';
-import 'package:perfect_memo/common/constant/toast.dart';
-import 'package:perfect_memo/common/provider/target_word_book_provider.dart';
+import 'package:perfect_wordbook/common/constant/color.dart';
+import 'package:perfect_wordbook/common/constant/toast.dart';
+import 'package:perfect_wordbook/common/provider/target_word_book_provider.dart';
 
 import 'package:go_router/go_router.dart';
-import 'package:perfect_memo/common/provider/word_filter_provider.dart';
-import 'package:perfect_memo/common/model/word_filter_model.dart';
-import 'package:perfect_memo/common/widgets/confirm_dialog.dart';
-import 'package:perfect_memo/common/widgets/custom_button.dart';
+import 'package:perfect_wordbook/common/provider/word_filter_provider.dart';
+import 'package:perfect_wordbook/common/model/word_filter_model.dart';
+import 'package:perfect_wordbook/common/widgets/confirm_dialog.dart';
+import 'package:perfect_wordbook/common/widgets/custom_button.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:perfect_memo/common/widgets/font_size_slider.dart';
+import 'package:perfect_wordbook/common/widgets/font_size_slider.dart';
 
 // COMP: filter sheet
 class FilterSheet extends ConsumerWidget {

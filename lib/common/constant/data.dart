@@ -1,5 +1,5 @@
 final languages = [
-  {"label": "English", "value": "GB"},
+  {"label": "English", "value": "US"},
   {"label": "日本語", "value": "JP"},
   {"label": "中文", "value": "CN"},
   {"label": "한국어", "value": "KR"},
@@ -17,7 +17,7 @@ final languages = [
 ];
 
 final supportLang = [
-  {"label": "English", "lang": "en", "value": "GB"},
+  {"label": "English", "lang": "en", "value": "US"},
   {"label": "日本語", "lang": "ja", "value": "JP"},
   {"label": "ไทย", "lang": "th", "value": "TH"},
   {"label": "한국어", "lang": "ko", "value": "KR"},

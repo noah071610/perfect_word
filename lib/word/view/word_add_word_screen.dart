@@ -3,17 +3,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:perfect_memo/common/constant/toast.dart';
-import 'package:perfect_memo/common/layout/default_layout.dart';
-import 'package:perfect_memo/common/model/word_card_model.dart';
-import 'package:perfect_memo/common/provider/target_word_book_provider.dart';
-import 'package:perfect_memo/common/provider/word_card_list_provider.dart';
-import 'package:perfect_memo/common/utils/utils.dart';
+import 'package:perfect_wordbook/common/constant/toast.dart';
+import 'package:perfect_wordbook/common/layout/default_layout.dart';
+import 'package:perfect_wordbook/common/model/word_card_model.dart';
+import 'package:perfect_wordbook/common/provider/target_word_book_provider.dart';
+import 'package:perfect_wordbook/common/provider/word_card_list_provider.dart';
+import 'package:perfect_wordbook/common/utils/utils.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
 
-import 'package:perfect_memo/word/view/word_add_generator.dart';
-import 'package:perfect_memo/word/view/word_add_manual.dart';
+import 'package:perfect_wordbook/word/view/word_add_generator.dart';
+import 'package:perfect_wordbook/word/view/word_add_manual.dart';
 
 class MemoAddWordScreen extends ConsumerStatefulWidget {
   final int targetIndex;
@@ -90,7 +90,8 @@ class _MemoAddWordScreenState extends ConsumerState<MemoAddWordScreen>
       final bool isExtract = type == AddWordType.extract;
       final String path = isExtract ? 'extract' : 'generate';
       final response = await dio.post(
-        'http://localhost:5555/api/perfect-wordbook/$path?language=${wordBookLanguage}&systemLanguage=${context.locale.toString()}',
+        'https://api.rankingtogether.com/api/perfect-wordbook/$path?language=${wordBookLanguage}&systemLanguage=${context.locale.toString()}',
+        // 'http://localhost:5555/api/perfect-wordbook',
         data: {
           'userText': isExtract
               ? aiWordExtractionController.text

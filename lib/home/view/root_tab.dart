@@ -1,15 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:perfect_memo/common/constant/toast.dart';
-import 'package:perfect_memo/common/layout/default_layout.dart';
-import 'package:perfect_memo/common/provider/word_book_list_provider.dart';
+import 'package:perfect_wordbook/common/constant/toast.dart';
+import 'package:perfect_wordbook/common/layout/default_layout.dart';
+import 'package:perfect_wordbook/common/provider/word_book_list_provider.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:perfect_memo/common/utils/utils.dart';
-import 'package:perfect_memo/common/widgets/custom_dialog.dart';
-import 'package:perfect_memo/common/widgets/floating_label_text_field.dart';
-import 'package:perfect_memo/home/view/setting_screen.dart';
-import 'package:perfect_memo/home/view/word_book_list_card.dart';
+import 'package:perfect_wordbook/common/utils/utils.dart';
+import 'package:perfect_wordbook/common/widgets/custom_dialog.dart';
+import 'package:perfect_wordbook/common/widgets/floating_label_text_field.dart';
+import 'package:perfect_wordbook/home/view/setting_screen.dart';
+import 'package:perfect_wordbook/home/view/word_book_list_card.dart';
 
 class RootTab extends ConsumerStatefulWidget {
   const RootTab({super.key});

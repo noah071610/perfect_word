@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:perfect_memo/common/constant/color.dart';
+import 'package:perfect_wordbook/common/constant/color.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:perfect_memo/common/theme/custom_colors.dart';
+import 'package:perfect_wordbook/common/theme/custom_colors.dart';
 
 class CustomDialog extends ConsumerWidget {
   final String title;

@@ -2,8 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
-import 'package:perfect_memo/common/constant/color.dart';
-import 'package:perfect_memo/common/provider/word_filter_provider.dart';
+import 'package:perfect_wordbook/common/constant/color.dart';
+import 'package:perfect_wordbook/common/provider/word_filter_provider.dart';
 
 class FontSizeSlider extends ConsumerWidget {
   const FontSizeSlider({

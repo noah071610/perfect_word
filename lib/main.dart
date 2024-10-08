@@ -2,25 +2,25 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:perfect_memo/common/constant/color.dart';
-import 'package:perfect_memo/common/model/target_word_book_model.dart';
-import 'package:perfect_memo/common/model/word_book_list_model.dart';
-import 'package:perfect_memo/common/model/word_book_model.dart';
-import 'package:perfect_memo/common/model/word_card_model.dart';
-import 'package:perfect_memo/common/model/word_filter_model.dart';
-import 'package:perfect_memo/common/provider/font_provider.dart';
-import 'package:perfect_memo/common/theme/custom_colors.dart';
-import 'package:perfect_memo/home/view/display_setting.dart';
-import 'package:perfect_memo/home/view/font_setting.dart';
-import 'package:perfect_memo/home/view/language_setting.dart';
-import 'package:perfect_memo/home/view/root_tab.dart';
+import 'package:perfect_wordbook/common/constant/color.dart';
+import 'package:perfect_wordbook/common/model/setting_model.dart';
+import 'package:perfect_wordbook/common/model/target_word_book_model.dart';
+import 'package:perfect_wordbook/common/model/word_book_list_model.dart';
+import 'package:perfect_wordbook/common/model/word_book_model.dart';
+import 'package:perfect_wordbook/common/model/word_card_model.dart';
+import 'package:perfect_wordbook/common/model/word_filter_model.dart';
+import 'package:perfect_wordbook/common/provider/setting_provider.dart';
+import 'package:perfect_wordbook/common/theme/custom_colors.dart';
+import 'package:perfect_wordbook/home/view/display_setting.dart';
+import 'package:perfect_wordbook/home/view/font_setting.dart';
+import 'package:perfect_wordbook/home/view/language_setting.dart';
+import 'package:perfect_wordbook/home/view/root_tab.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:perfect_memo/word/view/word_add_word_screen.dart';
+import 'package:perfect_wordbook/word/view/word_add_word_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:perfect_memo/word/view/word_screen.dart';
-import 'package:perfect_memo/common/provider/theme_provider.dart';
+import 'package:perfect_wordbook/word/view/word_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -62,6 +62,7 @@ void main() async {
   Hive.registerAdapter(CardFormatAdapter()); // 6
   Hive.registerAdapter(CardMaskingTypeAdapter());
   Hive.registerAdapter(TargetWordBookModelAdapter());
+  Hive.registerAdapter(SettingModelAdapter());
 
   EasyLocalization.logger.enableBuildModes = [];
 
@@ -77,7 +78,7 @@ void main() async {
 
         path:
             'assets/translations', // <-- change the path of the translation files
-        fallbackLocale: Locale('ja'),
+        fallbackLocale: Locale('ko'),
         child: MyApp(),
       ),
     ),
@@ -89,18 +90,22 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final themeMode = ref.watch(themeProvider);
-    final fontFamily = ref.watch(fontProvider);
+    final setting = ref.watch(settingProvider);
 
     return MaterialApp.router(
       routerConfig: _router,
-      title: 'Perfect Word-Book',
+      title: 'Perfect Wordbook',
+      debugShowCheckedModeBanner: false,
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
-      themeMode: themeMode,
+      themeMode: setting.themeNum == 0
+          ? ThemeMode.system
+          : setting.themeNum == 1
+              ? ThemeMode.light
+              : ThemeMode.dark,
       theme: ThemeData(
-        textTheme: GoogleFonts.getTextTheme(fontFamily).apply(
+        textTheme: GoogleFonts.getTextTheme(setting.font).apply(
           bodyColor: BLACK_COLOR, // 기본 텍스트 색상 설정
           displayColor: BLACK_COLOR, // 제목 등의 텍스트 색상 설정
         ),
@@ -190,7 +195,7 @@ class MyApp extends ConsumerWidget {
       ),
       darkTheme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: BLACK_COLOR,
-        textTheme: GoogleFonts.getTextTheme(fontFamily).apply(
+        textTheme: GoogleFonts.getTextTheme(setting.font).apply(
           bodyColor: WHITE_COLOR, // 기본 텍스트 색상 설정
           displayColor: WHITE_COLOR, // 제목 등의 텍스트 색상 설정
         ),

@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:perfect_memo/common/model/word_card_model.dart';
-import 'package:perfect_memo/common/model/word_filter_model.dart';
-import 'package:perfect_memo/common/provider/word_filter_provider.dart';
+import 'package:perfect_wordbook/common/model/word_card_model.dart';
+import 'package:perfect_wordbook/common/model/word_filter_model.dart';
+import 'package:perfect_wordbook/common/provider/word_filter_provider.dart';
 
-import 'package:perfect_memo/word/view/word_list_content.dart';
+import 'package:perfect_wordbook/word/view/word_list_content.dart';
 
 class WordList extends ConsumerStatefulWidget {
   const WordList({

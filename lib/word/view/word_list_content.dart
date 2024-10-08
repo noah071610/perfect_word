@@ -3,13 +3,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:perfect_memo/common/constant/color.dart';
-import 'package:perfect_memo/common/model/word_card_model.dart';
-import 'package:perfect_memo/common/provider/target_word_book_provider.dart';
-import 'package:perfect_memo/common/provider/word_card_list_provider.dart';
-import 'package:perfect_memo/common/provider/word_filter_provider.dart';
+import 'package:perfect_wordbook/common/constant/color.dart';
+import 'package:perfect_wordbook/common/model/word_card_model.dart';
+import 'package:perfect_wordbook/common/provider/target_word_book_provider.dart';
+import 'package:perfect_wordbook/common/provider/word_card_list_provider.dart';
+import 'package:perfect_wordbook/common/provider/word_filter_provider.dart';
 
-import 'package:perfect_memo/common/utils/utils.dart';
+import 'package:perfect_wordbook/common/utils/utils.dart';
 
 // COMP: 카드 컨텐츠
 class CardMainContent extends ConsumerWidget {

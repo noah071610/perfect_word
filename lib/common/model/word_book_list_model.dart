@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:perfect_memo/common/model/word_book_model.dart';
+import 'package:perfect_wordbook/common/model/word_book_model.dart';
 
 part 'word_book_list_model.g.dart';
 

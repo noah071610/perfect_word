@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:perfect_memo/common/layout/default_layout.dart';
-import 'package:perfect_memo/common/widgets/list_item.dart';
+import 'package:perfect_wordbook/common/layout/default_layout.dart';
+import 'package:perfect_wordbook/common/provider/setting_provider.dart';
+import 'package:perfect_wordbook/common/widgets/list_item.dart';
 import 'package:flutter/foundation.dart';
-import 'package:perfect_memo/common/provider/theme_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class DisplaySettingTab extends ConsumerStatefulWidget {
@@ -16,7 +16,7 @@ class DisplaySettingTab extends ConsumerStatefulWidget {
 class _DisplaySettingTabState extends ConsumerState<DisplaySettingTab> {
   @override
   Widget build(BuildContext context) {
-    final currentThemeMode = ref.watch(themeProvider);
+    final currentThemeMode = ref.watch(settingProvider).themeNum;
 
     return DefaultLayout(
       title: context.tr('display_settings'),
@@ -36,22 +36,22 @@ class _DisplaySettingTabState extends ConsumerState<DisplaySettingTab> {
                       title: context.tr('system'),
                       icon: Icons.settings_system_daydream,
                       settingType: SettingType.checker,
-                      isChecked: currentThemeMode == ThemeMode.system,
-                      onTap: () => _updateThemeMode(ThemeMode.system),
+                      isChecked: currentThemeMode == 0,
+                      onTap: () => _updateThemeMode(0),
                     ),
                     CustomListItem(
                       title: context.tr('light'),
                       icon: Icons.light_mode,
                       settingType: SettingType.checker,
-                      isChecked: currentThemeMode == ThemeMode.light,
-                      onTap: () => _updateThemeMode(ThemeMode.light),
+                      isChecked: currentThemeMode == 1,
+                      onTap: () => _updateThemeMode(1),
                     ),
                     CustomListItem(
                       title: context.tr('dark'),
                       icon: Icons.dark_mode,
                       settingType: SettingType.checker,
-                      isChecked: currentThemeMode == ThemeMode.dark,
-                      onTap: () => _updateThemeMode(ThemeMode.dark),
+                      isChecked: currentThemeMode == 2,
+                      onTap: () => _updateThemeMode(2),
                     ),
                   ],
                 ),
@@ -63,7 +63,7 @@ class _DisplaySettingTabState extends ConsumerState<DisplaySettingTab> {
     );
   }
 
-  void _updateThemeMode(ThemeMode mode) {
-    ref.read(themeProvider.notifier).setThemeMode(mode);
+  void _updateThemeMode(int themeNum) {
+    ref.read(settingProvider.notifier).setThemeMode(themeNum);
   }
 }

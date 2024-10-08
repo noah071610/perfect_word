@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:perfect_memo/common/constant/data.dart';
-import 'package:perfect_memo/common/layout/default_layout.dart';
-import 'package:perfect_memo/common/widgets/list_item.dart';
+import 'package:perfect_wordbook/common/constant/data.dart';
+import 'package:perfect_wordbook/common/layout/default_layout.dart';
+import 'package:perfect_wordbook/common/widgets/list_item.dart';
 import 'package:flutter/foundation.dart';
-import 'package:perfect_memo/common/provider/theme_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class LanguageSetting extends ConsumerStatefulWidget {
@@ -44,9 +43,5 @@ class _LanguageSettingState extends ConsumerState<LanguageSetting> {
         ),
       ),
     );
-  }
-
-  void _updateThemeMode(ThemeMode mode) {
-    ref.read(themeProvider.notifier).setThemeMode(mode);
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:perfect_memo/common/hive/hive.dart';
-import 'package:perfect_memo/common/model/word_book_list_model.dart';
-import 'package:perfect_memo/common/utils/utils.dart';
+import 'package:perfect_wordbook/common/hive/hive.dart';
+import 'package:perfect_wordbook/common/model/word_book_list_model.dart';
+import 'package:perfect_wordbook/common/utils/utils.dart';
 
 Future<List<WordBookListModel>> loadWordBookListFromHive(
     Ref<Object?> ref) async {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:perfect_memo/common/constant/toast.dart';
-import 'package:perfect_memo/common/widgets/list_item.dart';
+import 'package:perfect_wordbook/common/constant/toast.dart';
+import 'package:perfect_wordbook/common/widgets/list_item.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';

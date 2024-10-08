@@ -203,7 +203,7 @@ WordFilterModel _$WordFilterModelFromJson(Map<String, dynamic> json) =>
       fontSize: (json['fontSize'] as Map<String, dynamic>?)?.map(
             (k, e) => MapEntry(k, (e as num).toDouble()),
           ) ??
-          const {'word': 22, 'pronounce': 14, 'meaning': 16},
+          const {'word': 22, 'pronounce': 14, 'meaning': 16, 'value': 3},
     );
 
 Map<String, dynamic> _$WordFilterModelToJson(WordFilterModel instance) =>
