@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:perfect_wordbook/common/constant/color.dart';
@@ -11,10 +9,10 @@ import 'package:perfect_wordbook/common/model/word_card_model.dart';
 import 'package:perfect_wordbook/common/model/word_filter_model.dart';
 import 'package:perfect_wordbook/common/provider/setting_provider.dart';
 import 'package:perfect_wordbook/common/theme/custom_colors.dart';
-import 'package:perfect_wordbook/home/view/display_setting.dart';
-import 'package:perfect_wordbook/home/view/font_setting.dart';
-import 'package:perfect_wordbook/home/view/language_setting.dart';
-import 'package:perfect_wordbook/home/view/root_tab.dart';
+import 'package:perfect_wordbook/setting/view/display_setting.dart';
+import 'package:perfect_wordbook/setting/view/font_setting.dart';
+import 'package:perfect_wordbook/setting/view/language_setting.dart';
+import 'package:perfect_wordbook/common/view/root_tab.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -280,6 +278,22 @@ class MyApp extends ConsumerWidget {
           textStyle: TextStyle(color: WHITE_COLOR),
         ),
       ),
+      builder: (context, child) {
+        return Builder(
+          builder: (BuildContext context) {
+            final mediaQuery = MediaQuery.of(context);
+            final constrainedWidth =
+                mediaQuery.size.width > 600 ? 600.0 : mediaQuery.size.width;
+
+            return Center(
+              child: SizedBox(
+                width: constrainedWidth,
+                child: child!,
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

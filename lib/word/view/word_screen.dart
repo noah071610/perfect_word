@@ -72,7 +72,7 @@ class _WordScreenState extends ConsumerState<WordScreen> {
       if (!isSystemWordBook)
         IconButton(
           icon: const Icon(Icons.auto_fix_high),
-          onPressed: () => _navigateToAddWord(0),
+          onPressed: () => _navigateToAddWord(1),
         ),
       IconButton(
         icon: const Icon(CupertinoIcons.repeat),

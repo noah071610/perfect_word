@@ -74,7 +74,7 @@ class _MemoAddWordScreenState extends ConsumerState<MemoAddWordScreen>
 
     await ref.read(targetWordBookProvider.notifier).updateCount();
 
-    showCustomToast(context: context, message: '단어를 추가했어요! 🚀');
+    showCustomToast(context: context, message: context.tr('word_added'));
 
     context.go('/word_book');
   }

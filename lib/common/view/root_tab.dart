@@ -8,8 +8,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:perfect_wordbook/common/utils/utils.dart';
 import 'package:perfect_wordbook/common/widgets/custom_dialog.dart';
 import 'package:perfect_wordbook/common/widgets/floating_label_text_field.dart';
-import 'package:perfect_wordbook/home/view/setting_screen.dart';
-import 'package:perfect_wordbook/home/view/word_book_list_card.dart';
+import 'package:perfect_wordbook/home/view/word_book_list.dart';
+import 'package:perfect_wordbook/setting/view/setting_screen.dart';
 
 class RootTab extends ConsumerStatefulWidget {
   const RootTab({super.key});
@@ -78,8 +78,6 @@ class _RootTabState extends ConsumerState<RootTab>
 
   @override
   Widget build(BuildContext context) {
-    final wordBookListArr = ref.watch(wordBookListProvider);
-
     return DefaultLayout(
       title: index == 1 ? context.tr('setting') : context.tr('main_page'),
       centerTitle: index == 1 ? true : false,
@@ -109,21 +107,7 @@ class _RootTabState extends ConsumerState<RootTab>
       child: TabBarView(
         controller: controller,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: wordBookListArr.length,
-              itemBuilder: (context, index) {
-                final wordBookList = wordBookListArr[index];
-                return WordBookListCard(
-                    wordBookList: wordBookList,
-                    isOnlyOneList: wordBookListArr.length <= 1,
-                    isSystemWordBookListCard: wordBookList.key == 'supplement');
-              },
-            ),
-          ),
+          WordBookList(),
           SettingScreen(),
         ],
       ),
