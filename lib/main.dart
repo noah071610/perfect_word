@@ -21,11 +21,13 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:perfect_wordbook/word/view/word_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   await initializeDateFormatting();
+  await dotenv.load(fileName: ".env");
 
   // await Hive.deleteFromDisk();
   // try {
@@ -92,7 +94,6 @@ class MyApp extends ConsumerWidget {
 
     return MaterialApp.router(
       routerConfig: _router,
-      title: 'Perfect Wordbook',
       debugShowCheckedModeBanner: false,
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,

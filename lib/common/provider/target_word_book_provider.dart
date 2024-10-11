@@ -71,10 +71,11 @@ class TargetWordBookNotifier extends StateNotifier<TargetWordBookModel> {
     await _ref.read(wordBookListProvider.notifier).update(updatedList);
   }
 
-  Future<void> updateCount() async {
+  Future<void> updateCount({String? forceKey, String? forceBookListKey}) async {
+    final String targetBookKey = forceKey ?? state.wordBookKey;
     final List<WordBookListModel> list = _ref.read(wordBookListProvider);
     final List<WordCardModel> cards =
-        _ref.read(wordCardListProvider(state.wordBookKey));
+        _ref.read(wordCardListProvider(targetBookKey));
 
     final int memorizedCount =
         cards.where((card) => card.format == CardFormat.memorized).length;
@@ -82,10 +83,10 @@ class TargetWordBookNotifier extends StateNotifier<TargetWordBookModel> {
         cards.where((card) => card.format == CardFormat.difficulty).length;
 
     final updatedWordBookList = list
-        .map((e) => e.key == state.wordBookListKey
+        .map((e) => e.key == (forceBookListKey ?? state.wordBookListKey)
             ? e.copyWith(
                 wordBookList: e.wordBookList
-                    .map((book) => book.key == state.wordBookKey
+                    .map((book) => book.key == targetBookKey
                         ? book.copyWith(
                             memorizedWordCount: memorizedCount,
                             difficultyWordCount: difficultyCount,

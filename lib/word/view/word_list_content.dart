@@ -4,12 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:perfect_wordbook/common/constant/color.dart';
+import 'package:perfect_wordbook/common/constant/toast.dart';
+import 'package:perfect_wordbook/common/model/word_book_model.dart';
 import 'package:perfect_wordbook/common/model/word_card_model.dart';
 import 'package:perfect_wordbook/common/provider/target_word_book_provider.dart';
+import 'package:perfect_wordbook/common/provider/word_book_list_provider.dart';
 import 'package:perfect_wordbook/common/provider/word_card_list_provider.dart';
 import 'package:perfect_wordbook/common/provider/word_filter_provider.dart';
 
 import 'package:perfect_wordbook/common/utils/utils.dart';
+import 'package:perfect_wordbook/common/widgets/country_image.dart';
 
 // COMP: 카드 컨텐츠
 class CardMainContent extends ConsumerWidget {
@@ -129,10 +133,173 @@ class HiddenTextWidget extends StatelessWidget {
 class CardIcons extends ConsumerWidget {
   const CardIcons({
     super.key,
+    required this.targetIndex,
     required this.card,
   });
 
   final WordCardModel card;
+  final int targetIndex;
+
+  void _showMoveCardDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final wordBookListArr = ref.watch(wordBookListProvider);
+        final targetBook = ref.watch(targetWordBookProvider);
+        final List<WordBookModel> wordBookList = wordBookListArr
+            .expand((wordBookList) => wordBookList.wordBookList)
+            .where((e) => e.key != targetBook.wordBookKey)
+            .toList();
+
+        return AlertDialog(
+          contentPadding: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          content: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 25, horizontal: 30),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      context.tr('move_to_word_book'),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.0,
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    SizedBox(
+                      width: double.maxFinite,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: List.generate(
+                            wordBookList.length,
+                            (index) {
+                              final WordBookModel selectedBook =
+                                  wordBookList[index];
+                              return Column(
+                                children: [
+                                  GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    child: Container(
+                                      width: double.infinity,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8.0),
+                                        child: Row(
+                                          children: [
+                                            CountryImage(
+                                              language: selectedBook.language,
+                                            ),
+                                            SizedBox(
+                                              width: 10.0,
+                                            ),
+                                            Text(selectedBook.title),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    onTap: () async {
+                                      final cards = ref.read(
+                                          wordCardListProvider(
+                                              targetBook.wordBookKey));
+                                      final card = cards[targetIndex];
+                                      await ref
+                                          .read(wordCardListProvider(
+                                                  selectedBook.key)
+                                              .notifier)
+                                          .addCard(card.word, card.meaning,
+                                              card.pronounce,
+                                              format: card.format);
+                                      await ref
+                                          .read(wordCardListProvider(
+                                                  targetBook.wordBookKey)
+                                              .notifier)
+                                          .removeCard(card.key);
+
+                                      await ref
+                                          .read(targetWordBookProvider.notifier)
+                                          .updateCount(
+                                              forceKey: selectedBook.key,
+                                              forceBookListKey:
+                                                  selectedBook.key);
+                                      await ref
+                                          .read(targetWordBookProvider.notifier)
+                                          .updateCount();
+                                      // 여기에 선택된 단어장으로 카드를 이동하는 로직 추가
+                                      showCustomToast(
+                                        context: context,
+                                        message:
+                                            context.tr('move_to_word_complete'),
+                                      );
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                  if (index < wordBookList.length - 1)
+                                    Divider(),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          child: Text(
+                            context.tr('cancel'),
+                            style: TextStyle(
+                              color: Colors.red[600],
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                right: 10,
+                top: -16,
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).dialogTheme.backgroundColor,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white.withOpacity(0.1)
+                              : Colors.black.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 2,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: Icon(Icons.close, size: 20),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -168,6 +335,9 @@ class CardIcons extends ConsumerWidget {
                   break;
                 case 'delete':
                   cardList.removeCard(card.key);
+                  break;
+                case 'move':
+                  _showMoveCardDialog(context, ref);
                   break;
                 default:
               }

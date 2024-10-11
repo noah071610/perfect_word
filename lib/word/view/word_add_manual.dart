@@ -48,7 +48,6 @@ class ManualInputForm extends ConsumerWidget {
               wordController.text,
               meaningController.text,
               pronounceController.text,
-              'default',
             );
         await ref.read(targetWordBookProvider.notifier).updateCount();
 

@@ -91,14 +91,14 @@ class wordCardListNotifier extends StateNotifier<List<WordCardModel>> {
     state = loadedList;
   }
 
-  addCard(String word, String meaning, String pronounce, String format) {
+  addCard(String word, String meaning, String pronounce, {CardFormat? format}) {
     state = [
       WordCardModel(
         key: generateRandomKey(),
         word: word,
         meaning: meaning,
         pronounce: pronounce,
-        format: CardFormat.unchecked,
+        format: format ?? CardFormat.unchecked,
         createdAt: DateTime.now(),
       ),
       ...state,

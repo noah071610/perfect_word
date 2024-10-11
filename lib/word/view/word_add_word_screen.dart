@@ -11,6 +11,7 @@ import 'package:perfect_wordbook/common/provider/word_card_list_provider.dart';
 import 'package:perfect_wordbook/common/utils/utils.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:perfect_wordbook/word/view/word_add_generator.dart';
 import 'package:perfect_wordbook/word/view/word_add_manual.dart';
@@ -90,7 +91,7 @@ class _MemoAddWordScreenState extends ConsumerState<MemoAddWordScreen>
       final bool isExtract = type == AddWordType.extract;
       final String path = isExtract ? 'extract' : 'generate';
       final response = await dio.post(
-        'https://api.rankingtogether.com/api/perfect-wordbook/$path?language=${wordBookLanguage}&systemLanguage=${context.locale.toString()}',
+        '${dotenv.env['SERVER_URL']}/$path?language=${wordBookLanguage}&systemLanguage=${context.locale.toString()}',
         // 'http://localhost:5555/api/perfect-wordbook',
         data: {
           'userText': isExtract

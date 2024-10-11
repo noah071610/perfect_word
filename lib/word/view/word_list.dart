@@ -59,6 +59,7 @@ class _WordListState extends ConsumerState<WordList> {
                             ),
                             CardIcons(
                               card: card,
+                              targetIndex: index,
                             ),
                           ],
                         ),
